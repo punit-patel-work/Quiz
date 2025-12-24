@@ -1,0 +1,113 @@
+[
+    {
+        "id": 1,
+        "type": "multiple_choice",
+        "topic": "Science",
+        "question": "Which planet is known as the 'Red Planet'?",
+        "options": [
+            "Earth",
+            "Mars",
+            "Jupiter",
+            "Venus"
+        ],
+        "correct_answer": "Mars",
+        "explanation": "Mars gets its reddish color from iron oxide on its surface."
+    },
+    {
+        "id": 2,
+        "type": "fill_in_the_blank",
+        "topic": "History",
+        "question": "The year in which the Declaration of Independence was signed is ____________.",
+        "correct_answer": [
+            "1776"
+        ],
+        "explanation": "The Declaration of Independence was signed on July 4, 1776."
+    },
+    {
+        "id": 3,
+        "type": "fill_in_the_blank",
+        "topic": "Literature",
+        "question": "The character Sherlock Holmes was created by Sir Arthur Conan ____________.",
+        "correct_answer": [
+            "Doyle",
+            "C. Doyle"
+        ],
+        "explanation": "Multiple correct answers are allowed to account for variations in user input (e.g., 'Doyle' or 'C. Doyle')."
+    },
+    {
+        "id": 4,
+        "type": "true_false",
+        "topic": "Geography",
+        "question": "The capital of Australia is Sydney.",
+        "correct_answer": false,
+        "explanation": "The capital of Australia is Canberra."
+    },
+    {
+        "id": 5,
+        "type": "multiple_choice",
+        "topic": "Technology",
+        "question": "What does 'HTTP' stand for?",
+        "options": [
+            "HyperText Transfer Protocol",
+            "High-Tech Terminal Program",
+            "Hyperlink Text Processor",
+            "Home Tool Tracking Protocol"
+        ],
+        "correct_answer": "HyperText Transfer Protocol",
+        "explanation": "HTTP is the foundation of data communication for the World Wide Web."
+    },
+    {
+        "id": 6,
+        "type": "multiple_choice",
+        "topic": "Mathematics",
+        "question": "What is the value of π (pi) approximately?",
+        "options": [
+            "2.14",
+            "3.14",
+            "4.14",
+            "5.14"
+        ],
+        "correct_answer": "3.14",
+        "explanation": "Pi (π) is approximately 3.14159, often rounded to 3.14."
+    },
+    {
+        "id": 7,
+        "type": "true_false",
+        "topic": "Science",
+        "question": "The human body has four lungs.",
+        "correct_answer": false,
+        "explanation": "The human body has two lungs, not four."
+    },
+    {
+        "id": 8,
+        "type": "fill_in_the_blank",
+        "topic": "Geography",
+        "question": "The largest ocean on Earth is the ____________ Ocean.",
+        "correct_answer": [
+            "Pacific"
+        ],
+        "explanation": "The Pacific Ocean is the largest and deepest ocean on Earth."
+    },
+    {
+        "id": 9,
+        "type": "multiple_choice",
+        "topic": "History",
+        "question": "Who was the first President of the United States?",
+        "options": [
+            "Thomas Jefferson",
+            "George Washington",
+            "Abraham Lincoln",
+            "John Adams"
+        ],
+        "correct_answer": "George Washington",
+        "explanation": "George Washington served as the first President from 1789 to 1797."
+    },
+    {
+        "id": 10,
+        "type": "true_false",
+        "topic": "Science",
+        "question": "Water freezes at 0 degrees Celsius.",
+        "correct_answer": true,
+        "explanation": "At standard atmospheric pressure, water freezes at 0°C (32°F)."
+    }
+]

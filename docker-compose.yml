@@ -1,0 +1,51 @@
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:16-alpine
+    container_name: quiz_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: quizuser
+      POSTGRES_PASSWORD: quizpassword
+      POSTGRES_DB: quizdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - quiz_network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U quizuser -d quizdb" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Next.js Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: quiz_app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://quizuser:quizpassword@db:5432/quizdb
+      - NEXTAUTH_SECRET=20a78b92807338b5f92197c1b435cb33f39beda0af2f97da0544136d7b6b315e
+      - NEXTAUTH_URL=http://localhost:3001
+      - GMAIL_USER=punitpatidar9644@gmail.com
+      - GMAIL_APP_PASSWORD=xmhgavtkvgrwkkhi
+      - NODE_ENV=production
+    ports:
+      - "3001:3000"
+    networks:
+      - quiz_network
+
+networks:
+  quiz_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
