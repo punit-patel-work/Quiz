@@ -82,7 +82,7 @@ export async function PUT(request: Request) {
                 action: "UPDATE_SETTINGS",
                 targetType: "settings",
                 targetId: settings.id,
-                performedById: user.id,
+                adminId: user.id,
                 details: body,
             },
         })

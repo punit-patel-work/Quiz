@@ -113,7 +113,7 @@ export default function AdminLogsPage() {
                     </span>
                   </div>
                   <div className="text-sm text-muted-foreground mt-1">
-                    By: {log.performedBy?.name || log.performedBy?.email || "System"}
+                    By: {log.admin?.name || log.admin?.email || "System"}
                     {log.details && Object.keys(log.details).length > 0 && (
                       <span className="ml-2">
                         • {JSON.stringify(log.details).substring(0, 100)}
