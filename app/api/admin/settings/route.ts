@@ -23,9 +23,9 @@ export async function GET() {
         const settings = await prisma.systemSettings.findFirst()
 
         return NextResponse.json(settings || {
-            requireTeacherApproval: true,
-            allowNewRegistrations: true,
-            maintenanceMode: false,
+            siteName: "Quiz Platform",
+            allowRegistration: true,
+            requireEmailVerify: true,
         })
     } catch (error) {
         console.error("Settings fetch error:", error)
@@ -51,7 +51,7 @@ export async function PUT(request: Request) {
         }
 
         const body = await request.json()
-        const { requireTeacherApproval, allowNewRegistrations, maintenanceMode } = body
+        const { siteName, allowRegistration, requireEmailVerify } = body
 
         // Upsert settings
         const existingSettings = await prisma.systemSettings.findFirst()
@@ -61,17 +61,17 @@ export async function PUT(request: Request) {
             settings = await prisma.systemSettings.update({
                 where: { id: existingSettings.id },
                 data: {
-                    requireTeacherApproval: requireTeacherApproval ?? existingSettings.requireTeacherApproval,
-                    allowNewRegistrations: allowNewRegistrations ?? existingSettings.allowNewRegistrations,
-                    maintenanceMode: maintenanceMode ?? existingSettings.maintenanceMode,
+                    siteName: siteName ?? existingSettings.siteName,
+                    allowRegistration: allowRegistration ?? existingSettings.allowRegistration,
+                    requireEmailVerify: requireEmailVerify ?? existingSettings.requireEmailVerify,
                 },
             })
         } else {
             settings = await prisma.systemSettings.create({
                 data: {
-                    requireTeacherApproval: requireTeacherApproval ?? true,
-                    allowNewRegistrations: allowNewRegistrations ?? true,
-                    maintenanceMode: maintenanceMode ?? false,
+                    siteName: siteName ?? "Quiz Platform",
+                    allowRegistration: allowRegistration ?? true,
+                    requireEmailVerify: requireEmailVerify ?? true,
                 },
             })
         }
