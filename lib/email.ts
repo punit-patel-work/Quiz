@@ -1,27 +1,27 @@
 import nodemailer from 'nodemailer'
 
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD,
-    },
+  service: 'gmail',
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_APP_PASSWORD,
+  },
 })
 
 interface SendVerificationEmailParams {
-    to: string
-    token: string
-    baseUrl: string
+  to: string
+  token: string
+  baseUrl: string
 }
 
 export async function sendVerificationEmail({ to, token, baseUrl }: SendVerificationEmailParams) {
-    const verificationUrl = `${baseUrl}/verify-email?token=${token}`
+  const verificationUrl = `${baseUrl}/verify-email?token=${token}`
 
-    const mailOptions = {
-        from: `"Quiz Platform" <${process.env.GMAIL_USER}>`,
-        to,
-        subject: 'Verify Your Email Address',
-        html: `
+  const mailOptions = {
+    from: `"Quiz Platform" <${process.env.GMAIL_USER}>`,
+    to,
+    subject: 'Verify Your Email Address',
+    html: `
       <!DOCTYPE html>
       <html>
         <head>
@@ -88,7 +88,7 @@ export async function sendVerificationEmail({ to, token, baseUrl }: SendVerifica
         </body>
       </html>
     `,
-        text: `
+    text: `
       Welcome to Quiz Platform!
 
       Please verify your email address by clicking the link below:
@@ -98,13 +98,38 @@ export async function sendVerificationEmail({ to, token, baseUrl }: SendVerifica
 
       If you didn't create an account, you can safely ignore this email.
     `,
-    }
+  }
 
-    try {
-        await transporter.sendMail(mailOptions)
-        return { success: true }
-    } catch (error) {
-        console.error('Error sending verification email:', error)
-        return { success: false, error }
-    }
+  try {
+    await transporter.sendMail(mailOptions)
+    return { success: true }
+  } catch (error) {
+    console.error('Error sending verification email:', error)
+    return { success: false, error }
+  }
+}
+
+interface SendEmailParams {
+  to: string
+  subject: string
+  html: string
+  text?: string
+}
+
+export async function sendEmail({ to, subject, html, text }: SendEmailParams) {
+  const mailOptions = {
+    from: `"Quiz Platform" <${process.env.GMAIL_USER}>`,
+    to,
+    subject,
+    html,
+    text: text || html.replace(/<[^>]*>/g, ''), // Strip HTML for plain text
+  }
+
+  try {
+    await transporter.sendMail(mailOptions)
+    return { success: true }
+  } catch (error) {
+    console.error('Error sending email:', error)
+    return { success: false, error }
+  }
 }
