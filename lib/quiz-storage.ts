@@ -33,9 +33,13 @@ export function reconstructResults(
         } else if (question.type === "true_false") {
             isCorrect = userAnswer === question.correct_answer
         } else if (question.type === "fill_in_the_blank") {
-            const correctAnswers = Array.isArray(question.correct_answer)
+            const rawAnswers = Array.isArray(question.correct_answer)
                 ? question.correct_answer
                 : [question.correct_answer]
+
+            // Filter to only string answers and normalize
+            const correctAnswers = rawAnswers
+                .filter((ans): ans is string => typeof ans === "string")
 
             const normalizedUserAnswer = typeof userAnswer === "string"
                 ? userAnswer.trim().toLowerCase()

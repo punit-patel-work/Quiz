@@ -69,7 +69,7 @@ export async function GET(
                 hasAttempted: !!attempt,
                 status: attempt?.status || "not_started",
                 score: attempt?.score ?? null,
-                totalQuestions: attempt?.totalQuestions ?? quiz.totalQuestions,
+                totalQuestions: attempt?.totalQuestions ?? (quiz.questions as any[]).length,
                 percentage: attempt?.percentage ?? null,
                 startedAt: attempt?.startedAt ?? null,
                 submittedAt: attempt?.submittedAt ?? null,

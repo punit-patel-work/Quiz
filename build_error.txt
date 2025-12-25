@@ -1,0 +1,282 @@
+  Γû▓ Next.js 14.2.33
+  - Environments: .env.local, .env
+
+   Creating an optimized production build ...
+ Γ£ô Compiled successfully
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/46) ...
+List applications error: n [Error]: Dynamic server usage: Route /api/admin/teacher-applications couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at c (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2510.js:1:59227)
+    at d (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2034.js:1:1441)
+    at C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2034.js:404:60433
+    at c (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\app\api\admin\teacher-applications\route.js:1:946)
+    at C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:38417
+    at C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\server\lib\trace\tracer.js:140:36
+    at NoopContextManager.with (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854) {
+  description: "Route /api/admin/teacher-applications couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Admin logs fetch error: n [Error]: Dynamic server usage: Route /api/admin/logs couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at c (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2510.js:1:59227)
+    at d (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2034.js:1:1441)
+    at C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2034.js:404:60433
+    at c (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\app\api\admin\logs\route.js:1:946)
+    at C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:38417
+    at C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\server\lib\trace\tracer.js:140:36
+    at NoopContextManager.with (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854) {
+  description: "Route /api/admin/logs couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Admin users list error: n [Error]: Dynamic server usage: Route /api/admin/users couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at c (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2510.js:1:59227)
+    at d (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2034.js:1:1441)
+    at C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2034.js:404:60433
+    at d (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\app\api\admin\users\route.js:1:946)
+    at C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:38417
+    at C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\server\lib\trace\tracer.js:140:36
+    at NoopContextManager.with (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854) {
+  description: "Route /api/admin/users couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Email verification error: B [Error]: Dynamic server usage: Route /api/auth/verify couldn't be rendered statically because it used `request.url`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at V (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:21778)
+    at Object.get (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:29465)
+    at p (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\app\api\auth\verify\route.js:1:602)
+    at C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:38417
+    at C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\server\lib\trace\tracer.js:140:36
+    at NoopContextManager.with (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854)
+    at C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\server\lib\trace\tracer.js:122:103 {
+  description: "Route /api/auth/verify couldn't be rendered statically because it used `request.url`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Admin quizzes fetch error: n [Error]: Dynamic server usage: Route /api/admin/quizzes couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at c (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2510.js:1:59227)
+    at d (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2034.js:1:1441)
+    at C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2034.js:404:60433
+    at d (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\app\api\admin\quizzes\route.js:1:946)
+    at C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:38417
+    at C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\server\lib\trace\tracer.js:140:36
+    at NoopContextManager.with (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854) {
+  description: "Route /api/admin/quizzes couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Invitations fetch error: n [Error]: Dynamic server usage: Route /api/invitations couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at c (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2510.js:1:59227)
+    at d (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2034.js:1:1441)
+    at C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2034.js:404:60433
+    at c (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\app\api\invitations\route.js:1:934)
+    at C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:38417
+    at C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\server\lib\trace\tracer.js:140:36
+    at NoopContextManager.with (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854) {
+  description: "Route /api/invitations couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Settings fetch error: n [Error]: Dynamic server usage: Route /api/admin/settings couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at c (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2510.js:1:59227)
+    at d (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2034.js:1:1441)
+    at C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2034.js:404:60433
+    at p (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\app\api\admin\settings\route.js:1:954)
+    at C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:38417
+    at C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\server\lib\trace\tracer.js:140:36
+    at NoopContextManager.with (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854) {
+  description: "Route /api/admin/settings couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Get me error: n [Error]: Dynamic server usage: Route /api/me couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at c (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2510.js:1:59227)
+    at d (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2034.js:1:1441)
+    at C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2034.js:404:60433
+    at p (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\app\api\me\route.js:1:934)
+    at C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:38417
+    at C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\server\lib\trace\tracer.js:140:36
+    at NoopContextManager.with (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854) {
+  description: "Route /api/me couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Admin stats error: n [Error]: Dynamic server usage: Route /api/admin/stats couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at c (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2510.js:1:59227)
+    at d (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2034.js:1:1441)
+    at C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2034.js:404:60433
+    at c (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\app\api\admin\stats\route.js:1:945)
+    at C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:38417
+    at C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\server\lib\trace\tracer.js:140:36
+    at NoopContextManager.with (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854) {
+  description: "Route /api/admin/stats couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+   Generating static pages (11/46) 
+Profile fetch error: n [Error]: Dynamic server usage: Route /api/profile couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at c (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2510.js:1:59227)
+    at d (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2034.js:1:1441)
+    at C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2034.js:404:60433
+    at d (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\app\api\profile\route.js:1:942)
+    at C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:38417
+    at C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\server\lib\trace\tracer.js:140:36
+    at NoopContextManager.with (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854) {
+  description: "Route /api/profile couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Settings fetch error: n [Error]: Dynamic server usage: Route /api/settings couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at c (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2510.js:1:59227)
+    at d (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2034.js:1:1441)
+    at C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2034.js:404:60433
+    at p (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\app\api\settings\route.js:1:944)
+    at C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:38417
+    at C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\server\lib\trace\tracer.js:140:36
+    at NoopContextManager.with (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854) {
+  description: "Route /api/settings couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Quiz history error: n [Error]: Dynamic server usage: Route /api/quiz-history couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at c (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2510.js:1:59227)
+    at d (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2034.js:1:1441)
+    at C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2034.js:404:60433
+    at p (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\app\api\quiz-history\route.js:1:934)
+    at C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:38417
+    at C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\server\lib\trace\tracer.js:140:36
+    at NoopContextManager.with (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854) {
+  description: "Route /api/quiz-history couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+My classes fetch error: n [Error]: Dynamic server usage: Route /api/my-classes couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at c (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2510.js:1:59227)
+    at d (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2034.js:1:1441)
+    at C:\Users\Punit\Desktop\Programming\Quiz\.next\server\chunks\2034.js:404:60433
+    at u (C:\Users\Punit\Desktop\Programming\Quiz\.next\server\app\api\my-classes\route.js:1:934)
+    at C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:38417
+    at C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\server\lib\trace\tracer.js:140:36
+    at NoopContextManager.with (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (C:\Users\Punit\Desktop\Programming\Quiz\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854) {
+  description: "Route /api/my-classes couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+   Generating static pages (22/46) 
+   Generating static pages (34/46) 
+ Γ£ô Generating static pages (46/46)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                                 Size     First Load JS
+Γöî ╞Æ /                                                       178 B          96.2 kB
+Γö£ ╞Æ /_not-found                                             876 B          88.2 kB
+Γö£ ╞Æ /admin                                                  4.71 kB         113 kB
+Γö£ ╞Æ /admin/applications                                     7.29 kB         132 kB
+Γö£ ╞Æ /admin/classes                                          5.26 kB         133 kB
+Γö£ ╞Æ /admin/domains                                          4.88 kB         133 kB
+Γö£ ╞Æ /admin/logs                                             2.97 kB         117 kB
+Γö£ ╞Æ /admin/quizzes                                          3.02 kB         117 kB
+Γö£ ╞Æ /admin/settings                                         3.75 kB         115 kB
+Γö£ ╞Æ /admin/users                                            5.2 kB          142 kB
+Γö£ ╞Æ /api/admin/approved-domains                             0 B                0 B
+Γö£ ╞Æ /api/admin/approved-domains/[id]                        0 B                0 B
+Γö£ ╞Æ /api/admin/classes                                      0 B                0 B
+Γö£ ╞Æ /api/admin/logs                                         0 B                0 B
+Γö£ ╞Æ /api/admin/quizzes                                      0 B                0 B
+Γö£ ╞Æ /api/admin/settings                                     0 B                0 B
+Γö£ ╞Æ /api/admin/stats                                        0 B                0 B
+Γö£ ╞Æ /api/admin/teacher-applications                         0 B                0 B
+Γö£ ╞Æ /api/admin/teacher-applications/[id]/approve            0 B                0 B
+Γö£ ╞Æ /api/admin/teacher-applications/[id]/reject             0 B                0 B
+Γö£ ╞Æ /api/admin/users                                        0 B                0 B
+Γö£ ╞Æ /api/admin/users/[id]                                   0 B                0 B
+Γö£ ╞Æ /api/auth/[...nextauth]                                 0 B                0 B
+Γö£ ╞Æ /api/auth/register                                      0 B                0 B
+Γö£ ╞Æ /api/auth/verify                                        0 B                0 B
+Γö£ ╞Æ /api/classes                                            0 B                0 B
+Γö£ ╞Æ /api/classes/[id]                                       0 B                0 B
+Γö£ ╞Æ /api/classes/[id]/invite                                0 B                0 B
+Γö£ ╞Æ /api/classes/[id]/members                               0 B                0 B
+Γö£ ╞Æ /api/classes/[id]/members/[memberId]                    0 B                0 B
+Γö£ ╞Æ /api/classes/[id]/quizzes                               0 B                0 B
+Γö£ ╞Æ /api/classes/[id]/quizzes/[quizId]                      0 B                0 B
+Γö£ ╞Æ /api/classes/[id]/quizzes/[quizId]/corrections          0 B                0 B
+Γö£ ╞Æ /api/classes/[id]/quizzes/[quizId]/results              0 B                0 B
+Γö£ ╞Æ /api/classes/[id]/quizzes/[quizId]/results/[attemptId]  0 B                0 B
+Γö£ ╞Æ /api/classes/[id]/quizzes/[quizId]/retakes              0 B                0 B
+Γö£ ╞Æ /api/classes/[id]/quizzes/[quizId]/retakes/[retakeId]   0 B                0 B
+Γö£ ╞Æ /api/invitations                                        0 B                0 B
+Γö£ ╞Æ /api/invitations/[id]/accept                            0 B                0 B
+Γö£ ╞Æ /api/invitations/[id]/reject                            0 B                0 B
+Γö£ ╞Æ /api/me                                                 0 B                0 B
+Γö£ ╞Æ /api/my-classes                                         0 B                0 B
+Γö£ ╞Æ /api/my-classes/[id]/quizzes/[quizId]/result            0 B                0 B
+Γö£ ╞Æ /api/my-classes/[id]/quizzes/[quizId]/start             0 B                0 B
+Γö£ ╞Æ /api/my-classes/[id]/quizzes/[quizId]/submit            0 B                0 B
+Γö£ ╞Æ /api/profile                                            0 B                0 B
+Γö£ ╞Æ /api/profile/change-password                            0 B                0 B
+Γö£ ╞Æ /api/quiz-history                                       0 B                0 B
+Γö£ ╞Æ /api/quiz-result/[id]                                   0 B                0 B
+Γö£ ╞Æ /api/quizzes                                            0 B                0 B
+Γö£ ╞Æ /api/quizzes/[id]                                       0 B                0 B
+Γö£ ╞Æ /api/settings                                           0 B                0 B
+Γö£ ╞Æ /api/submit-quiz                                        0 B                0 B
+Γö£ ╞Æ /api/teacher-application                                0 B                0 B
+Γö£ ╞Æ /become-teacher                                         4.93 kB         109 kB
+Γö£ ╞Æ /classes                                                7.93 kB         122 kB
+Γö£ ╞Æ /classes/[id]                                           10.3 kB         135 kB
+Γö£ ╞Æ /classes/[id]/quizzes/[quizId]/edit                     5.02 kB         126 kB
+Γö£ ╞Æ /classes/[id]/quizzes/[quizId]/results                  8.92 kB         148 kB
+Γö£ ╞Æ /classes/[id]/quizzes/create                            4.66 kB         125 kB
+Γö£ ╞Æ /dashboard                                              3.27 kB         105 kB
+Γö£ ╞Æ /invitations                                            3.49 kB         105 kB
+Γö£ ╞Æ /login                                                  2.98 kB         111 kB
+Γö£ ╞Æ /my-classes                                             3.49 kB         107 kB
+Γö£ ╞Æ /my-classes/[id]                                        4.7 kB          115 kB
+Γö£ ╞Æ /my-classes/[id]/quiz/[quizId]                          4.65 kB         109 kB
+Γö£ ╞Æ /my-classes/[id]/quiz/[quizId]/result                   4.33 kB         108 kB
+Γö£ ╞Æ /profile                                                5.41 kB         107 kB
+Γö£ ╞Æ /quiz                                                   4.86 kB         109 kB
+Γö£ ╞Æ /register                                               4.51 kB         108 kB
+Γö£ ╞Æ /results                                                5.78 kB         101 kB
+Γö£ ╞Æ /settings                                               12.1 kB         130 kB
+Γö£ ╞Æ /setup                                                  25.3 kB         153 kB
+Γöö ╞Æ /verify-email                                           2.6 kB          107 kB
++ First Load JS shared by all                               87.3 kB
+  Γö£ chunks/2117-fe6f712bdeba3cff.js                         31.7 kB
+  Γö£ chunks/fd9d1056-0ad35491d2c4b6b8.js                     53.6 kB
+  Γöö other shared chunks (total)                             1.96 kB
+
+
+╞Æ Middleware                                                104 kB
+
+╞Æ  (Dynamic)  server-rendered on demand
+

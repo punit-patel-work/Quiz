@@ -90,7 +90,7 @@ export async function POST(request: Request) {
                 userId: session.user.id,
                 name,
                 description,
-                questions: quizValidation.data,
+                questions: quizValidation.data!,
             },
         })
 
