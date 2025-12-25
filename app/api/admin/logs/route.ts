@@ -31,7 +31,7 @@ export async function GET(request: Request) {
             prisma.adminLog.findMany({
                 where,
                 include: {
-                    performedBy: {
+                    admin: {
                         select: { id: true, name: true, email: true },
                     },
                 },
