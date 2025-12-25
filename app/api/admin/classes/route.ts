@@ -94,7 +94,7 @@ export async function DELETE(request: Request) {
                 action: "DELETE_CLASS",
                 targetType: "class",
                 targetId: classId,
-                performedById: user.id,
+                adminId: user.id,
                 details: { classId },
             },
         })
