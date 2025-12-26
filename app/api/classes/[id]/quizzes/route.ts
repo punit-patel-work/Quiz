@@ -62,7 +62,7 @@ export async function GET(
             orderBy: { startTime: "desc" },
         })
 
-        // If student, include their attempt status
+        // If student, include their attempt status and retake availability
         if (member) {
             const quizzesWithStatus = await Promise.all(
                 quizzes.map(async (quiz) => {
@@ -78,12 +78,33 @@ export async function GET(
 
                     const attempt = attempts[0] || null
 
+                    // Check for active retake (individual or class-wide)
+                    let hasRetake = false
+                    if (attempt?.status === "submitted") {
+                        const activeRetake = await prisma.quizRetake.findFirst({
+                            where: {
+                                classQuizId: quiz.id,
+                                expiresAt: { gt: now },
+                                used: false,
+                                OR: [
+                                    { memberId: member.id },
+                                    { memberId: null }, // Class-wide retake
+                                ],
+                            },
+                        })
+                        hasRetake = !!activeRetake
+                    }
+
+                    // Can attempt if: no attempt yet, or has active retake (and within deadline)
+                    const canAttempt = (!attempt && quiz.endTime > now) || hasRetake
+
                     return {
                         ...quiz,
                         totalQuestions: (quiz.questions as any[]).length,
                         attemptStatus: attempt?.status || null,
                         hasAttempted: !!attempt,
-                        canAttempt: !attempt && quiz.endTime > now,
+                        canAttempt,
+                        hasRetake,
                         score: attempt?.score,
                         percentage: attempt?.percentage,
                     }

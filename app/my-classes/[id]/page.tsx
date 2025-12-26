@@ -238,6 +238,13 @@ export default function StudentClassPage() {
                         </Link>
                       </Button>
                     )}
+                    {quiz.hasRetake && (
+                      <Button size="sm" asChild className="bg-blue-600 hover:bg-blue-700">
+                        <Link href={`/my-classes/${classId}/quiz/${quiz.id}`}>
+                          Retake Quiz
+                        </Link>
+                      </Button>
+                    )}
                   </div>
                 </CardContent>
               </Card>

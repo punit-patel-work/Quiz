@@ -117,10 +117,33 @@ export async function POST(
                 })
             }
 
-            return NextResponse.json(
-                { error: "You have already completed this quiz" },
-                { status: 400 }
-            )
+            // Check for active retake (individual or class-wide)
+            const activeRetake = await prisma.quizRetake.findFirst({
+                where: {
+                    classQuizId: params.quizId,
+                    expiresAt: { gt: now },
+                    used: false,
+                    OR: [
+                        { memberId: member.id },
+                        { memberId: null }, // Class-wide retake
+                    ],
+                },
+            })
+
+            if (!activeRetake) {
+                return NextResponse.json(
+                    { error: "You have already completed this quiz" },
+                    { status: 400 }
+                )
+            }
+
+            // Mark retake as used
+            await prisma.quizRetake.update({
+                where: { id: activeRetake.id },
+                data: { used: true, usedAt: now },
+            })
+
+            console.log("Start quiz - Using retake:", activeRetake.id)
         }
 
         // Check if there's enough time to complete

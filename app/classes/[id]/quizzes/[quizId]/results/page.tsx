@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
-import { ArrowLeft, Loader2, CheckCircle, XCircle, Clock, Download, RotateCcw, Users } from "lucide-react"
+import { ArrowLeft, Loader2, CheckCircle, XCircle, Clock, Download, RotateCcw, Users, Eye } from "lucide-react"
 import { format } from "date-fns"
 import {
   Dialog,
@@ -285,16 +285,30 @@ export default function QuizResultsPage() {
                         {r.submittedAt ? format(new Date(r.submittedAt), "MMM d, h:mm a") : "—"}
                       </td>
                       <td className="py-3 px-2 text-right">
-                        {(r.status === "submitted" || r.status === "in_progress") && (
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => openRetakeDialog("individual", r)}
-                            title={r.status === "in_progress" ? "Reset stuck quiz" : "Grant retake"}
-                          >
-                            <RotateCcw className="h-4 w-4" />
-                          </Button>
-                        )}
+                        <div className="flex items-center justify-end gap-1">
+                          {r.status === "submitted" && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              asChild
+                              title="View detailed answers"
+                            >
+                              <Link href={`/classes/${classId}/quizzes/${quizId}/student/${r.memberId}`}>
+                                <Eye className="h-4 w-4" />
+                              </Link>
+                            </Button>
+                          )}
+                          {(r.status === "submitted" || r.status === "in_progress") && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => openRetakeDialog("individual", r)}
+                              title={r.status === "in_progress" ? "Reset stuck quiz" : "Grant retake"}
+                            >
+                              <RotateCcw className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
