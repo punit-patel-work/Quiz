@@ -5,8 +5,9 @@ import { prisma } from "@/lib/prisma"
 // PUT /api/classes/[id]/quizzes/[quizId]/results/[attemptId] - Modify student score
 export async function PUT(
     request: Request,
-    { params }: { params: { id: string; quizId: string; attemptId: string } }
+    props: { params: Promise<{ id: string; quizId: string; attemptId: string }> }
 ) {
+    const params = await props.params;
     try {
         const session = await auth()
 
@@ -97,8 +98,9 @@ export async function PUT(
 // GET /api/classes/[id]/quizzes/[quizId]/results/[attemptId] - Get attempt details with modifications
 export async function GET(
     request: Request,
-    { params }: { params: { id: string; quizId: string; attemptId: string } }
+    props: { params: Promise<{ id: string; quizId: string; attemptId: string }> }
 ) {
+    const params = await props.params;
     try {
         const session = await auth()
 

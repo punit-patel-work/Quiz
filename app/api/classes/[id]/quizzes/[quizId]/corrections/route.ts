@@ -5,8 +5,9 @@ import { prisma } from "@/lib/prisma"
 // GET /api/classes/[id]/quizzes/[quizId]/corrections - List corrections
 export async function GET(
     request: Request,
-    { params }: { params: { id: string; quizId: string } }
+    props: { params: Promise<{ id: string; quizId: string }> }
 ) {
+    const params = await props.params;
     try {
         const session = await auth()
 
@@ -44,8 +45,9 @@ export async function GET(
 // POST /api/classes/[id]/quizzes/[quizId]/corrections - Apply correction to all students
 export async function POST(
     request: Request,
-    { params }: { params: { id: string; quizId: string } }
+    props: { params: Promise<{ id: string; quizId: string }> }
 ) {
+    const params = await props.params;
     try {
         const session = await auth()
 

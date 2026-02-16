@@ -5,10 +5,8 @@ import { sendEmail } from "@/lib/email"
 import { createNotification } from "@/lib/notifications"
 
 // POST /api/classes/[id]/invite - Invite students by email
-export async function POST(
-    request: Request,
-    { params }: { params: { id: string } }
-) {
+export async function POST(request: Request, props: { params: Promise<{ id: string }> }) {
+    const params = await props.params;
     try {
         const session = await auth()
 
@@ -204,10 +202,8 @@ export async function POST(
 }
 
 // GET /api/classes/[id]/invite - Get pending invitations for class
-export async function GET(
-    request: Request,
-    { params }: { params: { id: string } }
-) {
+export async function GET(request: Request, props: { params: Promise<{ id: string }> }) {
+    const params = await props.params;
     try {
         const session = await auth()
 

@@ -59,6 +59,21 @@ export function NotificationBell() {
     }
   }
   
+  const deleteNotification = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation()
+    try {
+      const res = await fetch(`/api/notifications/${id}`, { method: "DELETE" })
+      if (res.ok) {
+        setNotifications(prev => prev.filter(n => n.id !== id))
+        // If it was unread, decrease count
+        const wasUnread = notifications.find(n => n.id === id)?.isRead === false
+        if (wasUnread) setUnreadCount(prev => Math.max(0, prev - 1))
+      }
+    } catch (error) {
+      console.error("Failed to delete notification", error)
+    }
+  }
+
   const handleItemClick = (n: Notification) => {
       if (n.link) {
           router.push(n.link)
@@ -102,11 +117,32 @@ export function NotificationBell() {
                         <div 
                             key={n.id} 
                             className={cn(
-                                "px-4 py-3 hover:bg-muted/50 cursor-pointer transition-colors text-left",
+                                "relative group px-4 py-3 hover:bg-muted/50 cursor-pointer transition-colors text-left pr-8",
                                 !n.isRead && "bg-muted/30"
                             )}
                             onClick={() => handleItemClick(n)}
                         >
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="absolute top-2 right-2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
+                              onClick={(e) => deleteNotification(e, n.id)}
+                            >
+                              <span className="sr-only">Dismiss</span>
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="h-3 w-3"
+                              >
+                                <path d="M18 6 6 18" />
+                                <path d="m6 6 12 12" />
+                              </svg>
+                            </Button>
                             <div className="flex justify-between gap-2 mb-1">
                                 <h4 className={cn("text-sm font-medium leading-none", !n.isRead && "text-primary font-semibold")}>
                                     {n.title}

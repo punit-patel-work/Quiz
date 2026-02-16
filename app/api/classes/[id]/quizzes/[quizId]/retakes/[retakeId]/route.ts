@@ -5,8 +5,9 @@ import { prisma } from "@/lib/prisma"
 // DELETE /api/classes/[id]/quizzes/[quizId]/retakes/[retakeId] - Revoke retake
 export async function DELETE(
     request: Request,
-    { params }: { params: { id: string; quizId: string; retakeId: string } }
+    props: { params: Promise<{ id: string; quizId: string; retakeId: string }> }
 ) {
+    const params = await props.params;
     try {
         const session = await auth()
 

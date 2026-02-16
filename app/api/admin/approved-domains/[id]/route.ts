@@ -4,10 +4,8 @@ import { prisma } from "@/lib/prisma"
 import { canManageDomains } from "@/lib/permissions"
 
 // DELETE /api/admin/approved-domains/[id] - Remove approved domain
-export async function DELETE(
-    request: Request,
-    { params }: { params: { id: string } }
-) {
+export async function DELETE(request: Request, props: { params: Promise<{ id: string }> }) {
+    const params = await props.params;
     try {
         const session = await auth()
 

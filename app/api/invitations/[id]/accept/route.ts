@@ -3,10 +3,8 @@ import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 
 // POST /api/invitations/[id]/accept - Accept an invitation
-export async function POST(
-    request: Request,
-    { params }: { params: { id: string } }
-) {
+export async function POST(request: Request, props: { params: Promise<{ id: string }> }) {
+    const params = await props.params;
     try {
         const session = await auth()
 

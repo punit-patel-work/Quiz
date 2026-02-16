@@ -6,8 +6,9 @@ import { canGrantRetakes } from "@/lib/permissions"
 // GET /api/classes/[id]/quizzes/[quizId]/retakes - List retakes
 export async function GET(
     request: Request,
-    { params }: { params: { id: string; quizId: string } }
+    props: { params: Promise<{ id: string; quizId: string }> }
 ) {
+    const params = await props.params;
     try {
         const session = await auth()
 
@@ -52,8 +53,9 @@ export async function GET(
 // POST /api/classes/[id]/quizzes/[quizId]/retakes - Grant retake
 export async function POST(
     request: Request,
-    { params }: { params: { id: string; quizId: string } }
+    props: { params: Promise<{ id: string; quizId: string }> }
 ) {
+    const params = await props.params;
     try {
         const session = await auth()
 

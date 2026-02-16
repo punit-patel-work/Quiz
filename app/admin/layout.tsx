@@ -9,6 +9,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import Image from "next/image"
 
 const sidebarItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -19,6 +20,7 @@ const sidebarItems = [
   { href: "/admin/settings", label: "Settings", icon: Settings },
   { href: "/admin/logs", label: "Audit Logs", icon: Clock },
 ]
+
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -46,9 +48,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           "flex items-center h-14 border-b px-4",
           collapsed ? "justify-center" : "justify-between"
         )}>
+
           {!collapsed && (
             <div className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-primary" />
+              <div className="relative w-6 h-6">
+                <Image 
+                  src="/logo.svg" 
+                  alt="Logo" 
+                  fill 
+                  className="object-contain"
+                />
+              </div>
               <span className="font-semibold text-sm">Admin Panel</span>
             </div>
           )}

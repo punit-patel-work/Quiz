@@ -4,10 +4,8 @@ import { prisma } from "@/lib/prisma"
 import { canApproveTeachers } from "@/lib/permissions"
 
 // POST /api/admin/teacher-applications/[id]/approve - Approve application
-export async function POST(
-    request: Request,
-    { params }: { params: { id: string } }
-) {
+export async function POST(request: Request, props: { params: Promise<{ id: string }> }) {
+    const params = await props.params;
     try {
         const session = await auth()
 

@@ -6,8 +6,9 @@ import { calculateScore } from "@/lib/scoring"
 // POST /api/my-classes/[id]/quizzes/[quizId]/submit - Submit quiz answers
 export async function POST(
     request: Request,
-    { params }: { params: { id: string; quizId: string } }
+    props: { params: Promise<{ id: string; quizId: string }> }
 ) {
+    const params = await props.params;
     try {
         console.log("Submit quiz - Starting for classId:", params.id, "quizId:", params.quizId)
 

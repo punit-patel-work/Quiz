@@ -2,8 +2,10 @@ import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import { prisma } from "@/lib/prisma"
 import { verifyPassword } from "@/lib/auth-utils"
+import { authConfig } from "./auth.config"
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+    ...authConfig,
     providers: [
         Credentials({
             credentials: {
@@ -46,13 +48,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             },
         }),
     ],
-    pages: {
-        signIn: "/login",
-    },
     session: {
         strategy: "jwt",
     },
     callbacks: {
+        ...authConfig.callbacks,
         async jwt({ token, user }) {
             if (user) {
                 token.id = user.id
@@ -65,6 +65,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 session.user.id = token.id as string
 
                 // If role is missing in token (stale session), fetch from DB
+                // Prisma is available here (Node runtime)
                 if (token.role) {
                     session.user.role = token.role as string
                 } else if (token.id) {

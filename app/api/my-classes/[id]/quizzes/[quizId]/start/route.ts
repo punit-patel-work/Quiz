@@ -5,8 +5,9 @@ import { prisma } from "@/lib/prisma"
 // POST /api/my-classes/[id]/quizzes/[quizId]/start - Start a quiz attempt
 export async function POST(
     request: Request,
-    { params }: { params: { id: string; quizId: string } }
+    props: { params: Promise<{ id: string; quizId: string }> }
 ) {
+    const params = await props.params;
     try {
         console.log("Start quiz - classId:", params.id, "quizId:", params.quizId)
 

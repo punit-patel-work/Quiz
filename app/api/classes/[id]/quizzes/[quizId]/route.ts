@@ -5,8 +5,9 @@ import { prisma } from "@/lib/prisma"
 // GET /api/classes/[id]/quizzes/[quizId] - Get quiz details
 export async function GET(
     request: Request,
-    { params }: { params: { id: string; quizId: string } }
+    props: { params: Promise<{ id: string; quizId: string }> }
 ) {
+    const params = await props.params;
     try {
         const session = await auth()
 
@@ -116,8 +117,9 @@ export async function GET(
 // PUT /api/classes/[id]/quizzes/[quizId] - Update quiz
 export async function PUT(
     request: Request,
-    { params }: { params: { id: string; quizId: string } }
+    props: { params: Promise<{ id: string; quizId: string }> }
 ) {
+    const params = await props.params;
     try {
         const session = await auth()
 
@@ -181,8 +183,9 @@ export async function PUT(
 // DELETE /api/classes/[id]/quizzes/[quizId] - Delete quiz
 export async function DELETE(
     request: Request,
-    { params }: { params: { id: string; quizId: string } }
+    props: { params: Promise<{ id: string; quizId: string }> }
 ) {
+    const params = await props.params;
     try {
         const session = await auth()
 

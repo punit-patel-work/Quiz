@@ -4,10 +4,8 @@ import { prisma } from "@/lib/prisma"
 import { canManageUsers, Roles } from "@/lib/permissions"
 
 // GET /api/admin/users/[id] - Get user details
-export async function GET(
-    request: Request,
-    { params }: { params: { id: string } }
-) {
+export async function GET(request: Request, props: { params: Promise<{ id: string }> }) {
+    const params = await props.params;
     try {
         const session = await auth()
 
@@ -68,10 +66,8 @@ export async function GET(
 }
 
 // PUT /api/admin/users/[id] - Update user role/status
-export async function PUT(
-    request: Request,
-    { params }: { params: { id: string } }
-) {
+export async function PUT(request: Request, props: { params: Promise<{ id: string }> }) {
+    const params = await props.params;
     try {
         const session = await auth()
 

@@ -5,8 +5,9 @@ import { prisma } from "@/lib/prisma"
 // DELETE /api/classes/[id]/members/[memberId] - Remove member from class
 export async function DELETE(
     request: Request,
-    { params }: { params: { id: string; memberId: string } }
+    props: { params: Promise<{ id: string; memberId: string }> }
 ) {
+    const params = await props.params;
     try {
         const session = await auth()
 

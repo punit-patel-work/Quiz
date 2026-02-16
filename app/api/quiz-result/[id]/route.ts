@@ -3,10 +3,8 @@ import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { reconstructResults } from "@/lib/quiz-storage"
 
-export async function GET(
-    request: Request,
-    { params }: { params: { id: string } }
-) {
+export async function GET(request: Request, props: { params: Promise<{ id: string }> }) {
+    const params = await props.params;
     try {
         const session = await auth()
 

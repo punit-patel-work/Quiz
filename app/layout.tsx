@@ -12,9 +12,14 @@ import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"] })
 
+import Image from "next/image"
+
 export const metadata: Metadata = {
   title: "Quiz Platform - Test Your Knowledge",
   description: "Upload custom JSON quizzes and test your knowledge",
+  icons: {
+    icon: "/favicon.svg",
+  },
 }
 
 export default async function RootLayout({
@@ -39,10 +44,15 @@ export default async function RootLayout({
               <header className="border-b">
                 <div className="container mx-auto px-4 h-16 flex items-center justify-between">
                   <Link href="/" className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-gradient-to-br from-primary to-purple-600 rounded-lg flex items-center justify-center">
-                      <span className="text-white font-bold text-xl">Q</span>
+                    <div className="relative w-8 h-8">
+                      <Image 
+                        src="/logo.svg" 
+                        alt="Quiz Platform Logo" 
+                        fill 
+                        className="object-contain"
+                      />
                     </div>
-                    <span className="font-bold text-xl">Quiz Platform</span>
+                    <span className="font-bold text-xl ml-1">Quiz Platform</span>
                   </Link>
                   <div className="flex items-center gap-4">
                     <ThemeToggle />

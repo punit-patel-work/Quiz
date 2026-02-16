@@ -4,10 +4,8 @@ import { prisma } from "@/lib/prisma"
 import { createClassNotification } from "@/lib/notifications"
 
 // GET /api/classes/[id]/quizzes - List class quizzes
-export async function GET(
-    request: Request,
-    { params }: { params: { id: string } }
-) {
+export async function GET(request: Request, props: { params: Promise<{ id: string }> }) {
+    const params = await props.params;
     try {
         const session = await auth()
 
@@ -126,10 +124,8 @@ export async function GET(
 }
 
 // POST /api/classes/[id]/quizzes - Create a class quiz
-export async function POST(
-    request: Request,
-    { params }: { params: { id: string } }
-) {
+export async function POST(request: Request, props: { params: Promise<{ id: string }> }) {
+    const params = await props.params;
     try {
         const session = await auth()
 

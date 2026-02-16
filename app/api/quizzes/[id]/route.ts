@@ -3,10 +3,8 @@ import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 
 // GET /api/quizzes/[id] - Fetch specific quiz
-export async function GET(
-    request: Request,
-    { params }: { params: { id: string } }
-) {
+export async function GET(request: Request, props: { params: Promise<{ id: string }> }) {
+    const params = await props.params;
     try {
         const session = await auth()
 
@@ -48,10 +46,8 @@ export async function GET(
 }
 
 // DELETE /api/quizzes/[id] - Delete quiz
-export async function DELETE(
-    request: Request,
-    { params }: { params: { id: string } }
-) {
+export async function DELETE(request: Request, props: { params: Promise<{ id: string }> }) {
+    const params = await props.params;
     try {
         const session = await auth()
 

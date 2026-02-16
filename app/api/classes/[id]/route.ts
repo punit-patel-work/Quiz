@@ -3,10 +3,8 @@ import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 
 // GET /api/classes/[id] - Get class details
-export async function GET(
-    request: Request,
-    { params }: { params: { id: string } }
-) {
+export async function GET(request: Request, props: { params: Promise<{ id: string }> }) {
+    const params = await props.params;
     try {
         const session = await auth()
 
@@ -79,10 +77,8 @@ export async function GET(
 }
 
 // PUT /api/classes/[id] - Update class
-export async function PUT(
-    request: Request,
-    { params }: { params: { id: string } }
-) {
+export async function PUT(request: Request, props: { params: Promise<{ id: string }> }) {
+    const params = await props.params;
     try {
         const session = await auth()
 
@@ -141,10 +137,8 @@ export async function PUT(
 }
 
 // DELETE /api/classes/[id] - Delete class
-export async function DELETE(
-    request: Request,
-    { params }: { params: { id: string } }
-) {
+export async function DELETE(request: Request, props: { params: Promise<{ id: string }> }) {
+    const params = await props.params;
     try {
         const session = await auth()
 

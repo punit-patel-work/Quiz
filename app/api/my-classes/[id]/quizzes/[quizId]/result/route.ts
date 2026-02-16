@@ -5,8 +5,9 @@ import { prisma } from "@/lib/prisma"
 // GET /api/my-classes/[id]/quizzes/[quizId]/result - Get student's detailed result for a quiz
 export async function GET(
     request: Request,
-    { params }: { params: { id: string; quizId: string } }
+    props: { params: Promise<{ id: string; quizId: string }> }
 ) {
+    const params = await props.params;
     try {
         const session = await auth()
 
