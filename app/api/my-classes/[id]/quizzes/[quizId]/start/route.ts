@@ -77,8 +77,15 @@ export async function POST(
             )
         }
 
-        // Check if already attempted
-        const existingAttempt = await prisma.classQuizAttempt.findFirst({
+        // Check for existing attempts
+        const attemptsCount = await prisma.classQuizAttempt.count({
+            where: {
+                classQuizId: params.quizId,
+                memberId: member.id,
+            },
+        })
+
+        const latestAttempt = await prisma.classQuizAttempt.findFirst({
             where: {
                 classQuizId: params.quizId,
                 memberId: member.id,
@@ -86,40 +93,45 @@ export async function POST(
             orderBy: { startedAt: "desc" },
         })
 
-        if (existingAttempt) {
-            console.log("Start quiz - Existing attempt found, status:", existingAttempt.status)
+        // Resume if in progress
+        if (latestAttempt?.status === "in_progress") {
+            // Calculate remaining time
+            const attemptStartTime = latestAttempt.startedAt.getTime()
+            const durationMs = quiz.duration * 60 * 1000
+            const attemptEndTime = Math.min(
+                attemptStartTime + durationMs,
+                quiz.endTime.getTime()
+            )
+            const remainingSeconds = Math.max(0, Math.floor((attemptEndTime - now.getTime()) / 1000))
 
-            // If in progress, return the existing attempt
-            if (existingAttempt.status === "in_progress") {
-                // Calculate remaining time
-                const attemptStartTime = existingAttempt.startedAt.getTime()
-                const durationMs = quiz.duration * 60 * 1000
-                const attemptEndTime = Math.min(
-                    attemptStartTime + durationMs,
-                    quiz.endTime.getTime()
-                )
-                const remainingSeconds = Math.max(0, Math.floor((attemptEndTime - now.getTime()) / 1000))
+            console.log("Start quiz - Resuming, remaining seconds:", remainingSeconds)
 
-                console.log("Start quiz - Resuming, remaining seconds:", remainingSeconds)
+            return NextResponse.json({
+                attempt: latestAttempt,
+                quiz: {
+                    id: quiz.id,
+                    name: quiz.name,
+                    description: quiz.description,
+                    questions: quiz.questions,
+                    duration: quiz.duration,
+                    endTime: quiz.endTime,
+                    shuffleQuestions: quiz.shuffleQuestions,
+                },
+                remainingSeconds,
+                resuming: true,
+            })
+        }
 
-                return NextResponse.json({
-                    attempt: existingAttempt,
-                    quiz: {
-                        id: quiz.id,
-                        name: quiz.name,
-                        description: quiz.description,
-                        questions: quiz.questions,
-                        duration: quiz.duration,
-                        endTime: quiz.endTime,
-                        shuffleQuestions: quiz.shuffleQuestions,
-                    },
-                    remainingSeconds,
-                    resuming: true,
-                })
-            }
+        // Check if new attempt is allowed
+        const maxAttempts = quiz.maxAttempts || 1
+        let allowed = false
+        let activeRetake = null
 
-            // Check for active retake (individual or class-wide)
-            const activeRetake = await prisma.quizRetake.findFirst({
+        if (attemptsCount < maxAttempts) {
+            allowed = true
+        } else {
+            // Check for active retake grant
+            activeRetake = await prisma.quizRetake.findFirst({
                 where: {
                     classQuizId: params.quizId,
                     expiresAt: { gt: now },
@@ -130,20 +142,22 @@ export async function POST(
                     ],
                 },
             })
+            if (activeRetake) allowed = true
+        }
 
-            if (!activeRetake) {
-                return NextResponse.json(
-                    { error: "You have already completed this quiz" },
-                    { status: 400 }
-                )
-            }
+        if (!allowed) {
+            return NextResponse.json(
+                { error: "You have used all attempts for this quiz" },
+                { status: 400 }
+            )
+        }
 
-            // Mark retake as used
+        // Mark retake as used if applicable
+        if (activeRetake) {
             await prisma.quizRetake.update({
                 where: { id: activeRetake.id },
                 data: { used: true, usedAt: now },
             })
-
             console.log("Start quiz - Using retake:", activeRetake.id)
         }
 

@@ -19,6 +19,14 @@ interface DetailedQuestion {
   points: number
 }
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
 export default function TeacherStudentResultPage() {
   const [result, setResult] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -33,9 +41,15 @@ export default function TeacherStudentResultPage() {
     fetchResult()
   }, [classId, quizId, studentId])
 
-  const fetchResult = async () => {
+  const fetchResult = async (attemptId?: string) => {
+    setIsLoading(true)
     try {
-      const res = await fetch(`/api/classes/${classId}/quizzes/${quizId}/student/${studentId}`)
+      const url = new URL(`/api/classes/${classId}/quizzes/${quizId}/student/${studentId}`, window.location.origin)
+      if (attemptId) {
+        url.searchParams.set("attemptId", attemptId)
+      }
+      
+      const res = await fetch(url.toString())
       if (res.ok) {
         const data = await res.json()
         setResult(data)
@@ -48,6 +62,10 @@ export default function TeacherStudentResultPage() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleAttemptChange = (value: string) => {
+    fetchResult(value)
   }
 
   const getGrade = (pct: number) => {
@@ -89,16 +107,40 @@ export default function TeacherStudentResultPage() {
     <div className="container mx-auto px-4 py-12">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href={`/classes/${classId}/quizzes/${quizId}/results`}>
-              <ArrowLeft className="h-5 w-5" />
-            </Link>
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold">Student Result Details</h1>
-            <p className="text-muted-foreground">{result.quizName}</p>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" asChild>
+              <Link href={`/classes/${classId}/quizzes/${quizId}/results`}>
+                <ArrowLeft className="h-5 w-5" />
+              </Link>
+            </Button>
+            <div>
+              <h1 className="text-2xl font-bold">Student Result Details</h1>
+              <p className="text-muted-foreground">{result.quizName}</p>
+            </div>
           </div>
+
+          {result.allAttempts && result.allAttempts.length > 1 && (
+            <div className="w-[250px]">
+               <Select
+                value={result.currentAttemptId}
+                onValueChange={handleAttemptChange}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select attempt" />
+                </SelectTrigger>
+                <SelectContent>
+                  {result.allAttempts.map((attempt: any, index: number) => (
+                    <SelectItem key={attempt.id} value={attempt.id}>
+                      Attempt {result.allAttempts.length - index} 
+                      {attempt.isBest && " (Best)"}
+                      {" - "}{attempt.percentage?.toFixed(0)}%
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
         </div>
 
         {/* Student Info & Summary */}
@@ -193,21 +235,26 @@ export default function TeacherStudentResultPage() {
                     {/* True/False options */}
                     {q.questionType === "true_false" && (
                       <div className="flex gap-2 mb-3">
-                        {[true, false].map((val) => (
-                          <div
-                            key={String(val)}
-                            className={`text-sm px-3 py-1.5 rounded flex items-center gap-2 ${
-                              val === q.correctAnswer
-                                ? "bg-green-100 dark:bg-green-800/30 text-green-800 dark:text-green-200"
-                                : val === q.userAnswer && !q.isCorrect
-                                  ? "bg-red-100 dark:bg-red-800/30 text-red-800 dark:text-red-200"
-                                  : "bg-muted/50"
-                            }`}
-                          >
-                            <Circle className={`h-3 w-3 ${val === q.userAnswer ? "fill-current" : ""}`} />
-                            <span>{val ? "True" : "False"}</span>
-                          </div>
-                        ))}
+                        {[true, false].map((val) => {
+                          const isSelected = String(val).toLowerCase() === String(q.userAnswer).toLowerCase()
+                          const isCorrectOption = String(val).toLowerCase() === String(q.correctAnswer).toLowerCase()
+                          
+                          return (
+                            <div
+                              key={String(val)}
+                              className={`text-sm px-3 py-1.5 rounded flex items-center gap-2 ${
+                                isCorrectOption
+                                  ? "bg-green-100 dark:bg-green-800/30 text-green-800 dark:text-green-200"
+                                  : isSelected && !q.isCorrect
+                                    ? "bg-red-100 dark:bg-red-800/30 text-red-800 dark:text-red-200"
+                                    : "bg-muted/50"
+                              }`}
+                            >
+                              <Circle className={`h-3 w-3 ${isSelected ? "fill-current" : ""}`} />
+                              <span>{val ? "True" : "False"}</span>
+                            </div>
+                          )
+                        })}
                       </div>
                     )}
 

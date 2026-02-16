@@ -77,12 +77,37 @@ export async function GET(
 
         // If student, don't include questions unless starting attempt (handled by separate endpoint)
         if (!isTeacher) {
-            const attempt = member ? await prisma.classQuizAttempt.findFirst({
+            // Count attempts
+            const attemptsCount = member ? await prisma.classQuizAttempt.count({
+                where: {
+                    classQuizId: params.quizId,
+                    memberId: member.id,
+                },
+            }) : 0
+
+            const latestAttempt = member ? await prisma.classQuizAttempt.findFirst({
                 where: {
                     classQuizId: params.quizId,
                     memberId: member.id,
                 },
                 orderBy: { startedAt: "desc" },
+            }) : null
+
+            // Can attempt if manually allowed (infinite) or below max attempts
+            // maxAttempts default is 1. If 0 or null (unlikely based on schema default), assume 1.
+            const maxAttempts = quiz.maxAttempts || 1
+            const canAttempt = !latestAttempt || (attemptsCount < maxAttempts && latestAttempt.status === "submitted")
+            // Note: If latest attempt is in_progress, they should "continue" it rather than start new, 
+            // but the UI might handle that differently. For now, let's say canAttempt = true if they have tries left.
+            // If in_progress, the start endpoint usually resumes. 
+            // We should check if they have an active attempt.
+
+            const activeAttempt = member ? await prisma.classQuizAttempt.findFirst({
+                where: {
+                    classQuizId: params.quizId,
+                    memberId: member.id,
+                    status: "in_progress",
+                },
             }) : null
 
             return NextResponse.json({
@@ -93,10 +118,13 @@ export async function GET(
                 startTime: quiz.startTime,
                 endTime: quiz.endTime,
                 showResults: quiz.showResults,
+                maxAttempts: quiz.maxAttempts,
+                attemptsTaken: attemptsCount,
                 totalQuestions: (quiz.questions as any[]).length,
-                attemptStatus: attempt?.status || null,
-                hasAttempted: !!attempt,
-                canAttempt: !attempt && quiz.endTime > now,
+                attemptStatus: latestAttempt?.status || null,
+                hasAttempted: attemptsCount > 0,
+                canAttempt: (attemptsCount < maxAttempts || !!activeAttempt) && quiz.endTime > now,
+                activeAttemptId: activeAttempt?.id,
                 isTeacher: false,
             })
         }

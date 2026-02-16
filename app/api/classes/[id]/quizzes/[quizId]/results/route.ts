@@ -60,21 +60,33 @@ export async function GET(
         })
 
         const results = members.map((member) => {
-            const attempt = member.attempts[0]
+            const attempts = member.attempts
+            const attemptsCount = attempts.length
+
+            // Find best submitted attempt
+            const bestAttempt = attempts
+                .filter(a => a.status === "submitted" && a.percentage !== null)
+                .sort((a, b) => (b.percentage || 0) - (a.percentage || 0))[0]
+
+            // If no submitted attempt, fall back to latest attempt (e.g. in_progress)
+            const latestAttempt = attempts.sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime())[0]
+
+            const displayAttempt = bestAttempt || latestAttempt || null
 
             return {
                 memberId: member.id,
                 userId: member.userId,
                 name: member.user.name,
                 email: member.user.email,
-                hasAttempted: !!attempt,
-                status: attempt?.status || "not_started",
-                score: attempt?.score ?? null,
-                totalQuestions: attempt?.totalQuestions ?? (quiz.questions as any[]).length,
-                percentage: attempt?.percentage ?? null,
-                startedAt: attempt?.startedAt ?? null,
-                submittedAt: attempt?.submittedAt ?? null,
-                autoSubmitted: attempt?.autoSubmitted ?? false,
+                hasAttempted: attemptsCount > 0,
+                attemptsCount,
+                status: displayAttempt?.status || "not_started",
+                score: displayAttempt?.score ?? null,
+                totalQuestions: displayAttempt?.totalQuestions ?? (quiz.questions as any[]).length,
+                percentage: displayAttempt?.percentage ?? null,
+                startedAt: displayAttempt?.startedAt ?? null,
+                submittedAt: displayAttempt?.submittedAt ?? null,
+                autoSubmitted: displayAttempt?.autoSubmitted ?? false,
             }
         })
 

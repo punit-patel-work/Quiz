@@ -65,21 +65,25 @@ export async function GET(request: Request, props: { params: Promise<{ id: strin
         if (member) {
             const quizzesWithStatus = await Promise.all(
                 quizzes.map(async (quiz) => {
-                    // Find the latest attempt for this student
+                    // Fetch all attempts to determine best score and attempt count
                     const attempts = await prisma.classQuizAttempt.findMany({
                         where: {
                             classQuizId: quiz.id,
                             memberId: member.id,
                         },
                         orderBy: { startedAt: "desc" },
-                        take: 1,
                     })
 
-                    const attempt = attempts[0] || null
+                    const latestAttempt = attempts[0] || null
+
+                    // Find best submitted attempt
+                    const bestAttempt = attempts
+                        .filter(a => a.status === "submitted" && a.percentage !== null)
+                        .sort((a, b) => (b.percentage || 0) - (a.percentage || 0))[0]
 
                     // Check for active retake (individual or class-wide)
                     let hasRetake = false
-                    if (attempt?.status === "submitted") {
+                    if (latestAttempt?.status === "submitted") {
                         const activeRetake = await prisma.quizRetake.findFirst({
                             where: {
                                 classQuizId: quiz.id,
@@ -94,18 +98,34 @@ export async function GET(request: Request, props: { params: Promise<{ id: strin
                         hasRetake = !!activeRetake
                     }
 
-                    // Can attempt if: no attempt yet, or has active retake (and within deadline)
-                    const canAttempt = (!attempt && quiz.endTime > now) || hasRetake
+                    // Can attempt if: 
+                    // 1. No attempts yet
+                    // 2. Attempts < Max Attempts (and latest is submitted)
+                    // 3. Has specific retake granted
+                    // 4. Latest is in_progress (can resume)
+
+                    const maxAttempts = quiz.maxAttempts || 1
+                    const attemptsCount = attempts.length
+
+                    const canAttempt =
+                        (quiz.endTime > now && (
+                            !latestAttempt ||
+                            (attemptsCount < maxAttempts && latestAttempt.status === "submitted") ||
+                            latestAttempt.status === "in_progress"
+                        )) || hasRetake
 
                     return {
                         ...quiz,
                         totalQuestions: (quiz.questions as any[]).length,
-                        attemptStatus: attempt?.status || null,
-                        hasAttempted: !!attempt,
+                        attemptStatus: latestAttempt?.status || null,
+                        hasAttempted: attempts.length > 0,
                         canAttempt,
                         hasRetake,
-                        score: attempt?.score,
-                        percentage: attempt?.percentage,
+                        // Return BEST score, or latest if no best (fallback), or null
+                        score: bestAttempt?.score ?? latestAttempt?.score,
+                        percentage: bestAttempt?.percentage ?? latestAttempt?.percentage,
+                        attemptsTaken: attemptsCount,
+                        maxAttempts
                     }
                 })
             )

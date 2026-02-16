@@ -148,89 +148,96 @@ export default function StudentClassPage() {
                 <CardContent className="p-4 flex items-center justify-between">
                   <div>
                     <h3 className="font-medium">{quiz.name}</h3>
-                    <div className="text-sm text-muted-foreground flex items-center gap-4">
-                      <span>{quiz.totalQuestions || (quiz.questions as any[]).length} questions</span>
-                      <span>{quiz.duration} min</span>
-                      <span className="text-red-500">
-                        Ends {formatDistanceToNow(new Date(quiz.endTime), { addSuffix: true })}
-                      </span>
-                    </div>
-                  </div>
-                  <Button asChild>
-                    <Link href={`/my-classes/${classId}/quiz/${quiz.id}`}>
-                      <Play className="mr-2 h-4 w-4" />
-                      Start Quiz
-                    </Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-
-        {/* Upcoming Quizzes */}
-        {upcomingQuizzes.length > 0 && (
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-blue-600 flex items-center gap-2">
-              <Clock className="h-5 w-5" />
-              Upcoming
-            </h2>
-            {upcomingQuizzes.map((quiz) => (
-              <Card key={quiz.id} className="border-blue-200 dark:border-blue-900">
-                <CardContent className="p-4 flex items-center justify-between">
-                  <div>
-                    <h3 className="font-medium">{quiz.name}</h3>
-                    <div className="text-sm text-muted-foreground flex items-center gap-4">
-                      <span>{quiz.totalQuestions || (quiz.questions as any[]).length} questions</span>
-                      <span>{quiz.duration} min</span>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-medium">
-                      Starts {formatDistanceToNow(new Date(quiz.startTime), { addSuffix: true })}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {format(new Date(quiz.startTime), "MMM d, h:mm a")}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-
-        {/* Completed Quizzes */}
-        {completedQuizzes.length > 0 && (
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-muted-foreground flex items-center gap-2">
-              <CheckCircle className="h-5 w-5" />
-              Completed
-            </h2>
-            {completedQuizzes.map((quiz) => (
-              <Card key={quiz.id}>
-                <CardContent className="p-4 flex items-center justify-between">
-                  <div>
-                    <h3 className="font-medium">{quiz.name}</h3>
-                    <div className="text-sm text-muted-foreground">
-                      {quiz.totalQuestions || (quiz.questions as any[]).length} questions • {quiz.duration} min
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    {quiz.score !== undefined && quiz.score !== null ? (
-                      <div className="text-right">
-                        <div className="text-lg font-bold text-green-600">
-                          {quiz.percentage?.toFixed(0)}%
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {quiz.score} / {quiz.totalQuestions || (quiz.questions as any[]).length}
-                        </div>
+                      <div className="text-sm text-muted-foreground flex items-center gap-4">
+                        <span>{quiz.totalQuestions || (quiz.questions as any[]).length} questions</span>
+                        <span>{quiz.duration} min</span>
+                        {quiz.maxAttempts > 1 && (
+                            <span>Attempts: {quiz.attemptsTaken}/{quiz.maxAttempts}</span>
+                        )}
+                        <span className="text-red-500">
+                          Ends {formatDistanceToNow(new Date(quiz.endTime), { addSuffix: true })}
+                        </span>
                       </div>
-                    ) : (
-                      <div className="flex items-center gap-2 text-yellow-600">
-                        <Clock className="h-4 w-4" />
-                        <span className="text-sm">In Progress</span>
+                    </div>
+                    <Button asChild>
+                      <Link href={`/my-classes/${classId}/quiz/${quiz.id}`}>
+                        <Play className="mr-2 h-4 w-4" />
+                        {quiz.hasAttempted ? "Retake Quiz" : "Start Quiz"}
+                      </Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+
+          {/* Upcoming Quizzes */}
+          {upcomingQuizzes.length > 0 && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold text-blue-600 flex items-center gap-2">
+                <Clock className="h-5 w-5" />
+                Upcoming
+              </h2>
+              {upcomingQuizzes.map((quiz) => (
+                <Card key={quiz.id} className="border-blue-200 dark:border-blue-900">
+                  <CardContent className="p-4 flex items-center justify-between">
+                    <div>
+                      <h3 className="font-medium">{quiz.name}</h3>
+                      <div className="text-sm text-muted-foreground flex items-center gap-4">
+                        <span>{quiz.totalQuestions || (quiz.questions as any[]).length} questions</span>
+                        <span>{quiz.duration} min</span>
+                        {quiz.maxAttempts > 1 && (
+                            <span>{quiz.maxAttempts} Attempts allowed</span>
+                        )}
                       </div>
-                    )}
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-medium">
+                        Starts {formatDistanceToNow(new Date(quiz.startTime), { addSuffix: true })}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {format(new Date(quiz.startTime), "MMM d, h:mm a")}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+
+          {/* Completed Quizzes */}
+          {completedQuizzes.length > 0 && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold text-muted-foreground flex items-center gap-2">
+                <CheckCircle className="h-5 w-5" />
+                Completed
+              </h2>
+              {completedQuizzes.map((quiz) => (
+                <Card key={quiz.id}>
+                  <CardContent className="p-4 flex items-center justify-between">
+                    <div>
+                      <h3 className="font-medium">{quiz.name}</h3>
+                      <div className="text-sm text-muted-foreground">
+                        {quiz.totalQuestions || (quiz.questions as any[]).length} questions • {quiz.duration} min
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      {quiz.score !== undefined && quiz.score !== null ? (
+                        <div className="text-right">
+                          <div className="text-lg font-bold text-green-600">
+                            {quiz.percentage?.toFixed(0)}%
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {quiz.attemptsTaken > 1 ? "Best Score" : "Score"}: {quiz.score} / {quiz.totalQuestions || (quiz.questions as any[]).length}
+                            {quiz.attemptsTaken > 1 && ` (${quiz.attemptsTaken} attempts)`}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2 text-yellow-600">
+                          <Clock className="h-4 w-4" />
+                          <span className="text-sm">In Progress</span>
+                        </div>
+                      )}
                     {quiz.score !== undefined && quiz.showResults && (
                       <Button size="sm" variant="outline" asChild>
                         <Link href={`/my-classes/${classId}/quiz/${quiz.id}/result`}>

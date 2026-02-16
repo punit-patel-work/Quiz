@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
+import { checkAnswer } from "@/lib/scoring"
 
 // GET /api/my-classes/[id]/quizzes/[quizId]/result - Get student's detailed result for a quiz
 export async function GET(
@@ -73,35 +74,29 @@ export async function GET(
             detailedResults = questions.map((q, index) => {
                 // Use q.id (the question's actual id) to lookup the answer
                 const userAnswer = answerMap.get(q.id)
-                let isCorrect = false
+
+                // Use share scoring logic
+                const isCorrect = checkAnswer(q, userAnswer)
+
                 let correctAnswer: any = null
 
-                if (q.type === "multiple_choice") {
-                    // Options are plain strings, correct_answer is the correct option text
+                if (q.type === "multiple_choice" || q.type === "true_false") {
                     correctAnswer = q.correct_answer
-                    isCorrect = userAnswer === q.correct_answer
-                } else if (q.type === "true_false") {
-                    correctAnswer = q.correct_answer
-                    isCorrect = userAnswer === q.correct_answer
                 } else if (q.type === "fill_in_the_blank") {
-                    // Fill in the blank can have multiple correct answers
                     const correctAnswers = Array.isArray(q.correct_answer)
                         ? q.correct_answer
                         : [q.correct_answer]
-                    correctAnswer = correctAnswers[0] // Show first one
-                    isCorrect = correctAnswers.some((ans: string) =>
-                        ans.toLowerCase().trim() === (userAnswer || "").toLowerCase().trim()
-                    )
+                    correctAnswer = correctAnswers[0]
                 }
 
                 return {
                     questionIndex: index,
                     questionText: q.question,
                     questionType: q.type,
-                    // Options are plain strings for multiple choice
                     options: q.options || null,
                     userAnswer,
                     correctAnswer,
+                    explanation: q.explanation || null,
                     isCorrect,
                     points: q.points || 1,
                 }
@@ -116,7 +111,6 @@ export async function GET(
             submittedAt: attempt.submittedAt,
             autoSubmitted: attempt.autoSubmitted,
             showResults: quiz.showResults,
-            // Only include detailed results if showResults is enabled
             details: detailedResults,
         })
     } catch (error) {

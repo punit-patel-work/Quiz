@@ -39,8 +39,8 @@ export async function GET(
             return NextResponse.json({ error: "Quiz not found" }, { status: 404 })
         }
 
-        // Get the student's attempt
-        const attempt = await prisma.classQuizAttempt.findFirst({
+        // Get all attempts for this student
+        const attempts = await prisma.classQuizAttempt.findMany({
             where: {
                 classQuizId: params.quizId,
                 memberId: params.studentId,
@@ -58,13 +58,41 @@ export async function GET(
             },
         })
 
-        if (!attempt) {
+        if (!attempts || attempts.length === 0) {
             return NextResponse.json({ error: "No result found" }, { status: 404 })
         }
 
+        // Determine which attempt to show
+        const url = new URL(request.url)
+        const attemptId = url.searchParams.get("attemptId")
+
+        let currentAttempt = attempts[0] // Default to latest
+
+        if (attemptId) {
+            const found = attempts.find(a => a.id === attemptId)
+            if (found) currentAttempt = found
+        } else {
+            // Default to BEST attempt if not specified
+            const best = [...attempts].sort((a, b) => (b.percentage || 0) - (a.percentage || 0))[0]
+            if (best) currentAttempt = best
+        }
+
+        // Build attempt summary list for dropdown
+        const attemptsSummary = attempts.map(a => ({
+            id: a.id,
+            score: a.score,
+            percentage: a.percentage,
+            submittedAt: a.submittedAt,
+            isBest: a.id === ([...attempts].sort((a, b) => (b.percentage || 0) - (a.percentage || 0))[0]?.id)
+        })).sort((a, b) => {
+            const dateA = a.submittedAt ? new Date(a.submittedAt).getTime() : 0
+            const dateB = b.submittedAt ? new Date(b.submittedAt).getTime() : 0
+            return dateB - dateA
+        })
+
         // Build detailed breakdown
         const questions = quiz.questions as any[]
-        const userAnswers = (attempt.userAnswers as any[]) || []
+        const userAnswers = (currentAttempt.userAnswers as any[]) || []
 
         // Create a map for quick lookup - key is the question's id
         const answerMap = new Map<number, any>()
@@ -84,7 +112,10 @@ export async function GET(
                 isCorrect = userAnswer === q.correct_answer
             } else if (q.type === "true_false") {
                 correctAnswer = q.correct_answer
-                isCorrect = userAnswer === q.correct_answer
+                // Robust comparison for T/F (handle boolean/string mismatch)
+                const correctStr = String(correctAnswer).toLowerCase()
+                const userStr = String(userAnswer).toLowerCase()
+                isCorrect = correctStr === userStr
             } else if (q.type === "fill_in_the_blank") {
                 // Fill in the blank can have multiple correct answers
                 const correctAnswers = Array.isArray(q.correct_answer)
@@ -112,16 +143,18 @@ export async function GET(
         return NextResponse.json({
             quizName: quiz.name,
             student: {
-                id: attempt.memberId,
-                name: attempt.member.user.name,
-                email: attempt.member.user.email,
+                id: currentAttempt.memberId,
+                name: currentAttempt.member.user.name,
+                email: currentAttempt.member.user.email,
             },
-            score: attempt.score || 0,
-            totalQuestions: attempt.totalQuestions,
-            percentage: attempt.percentage || 0,
-            submittedAt: attempt.submittedAt,
-            autoSubmitted: attempt.autoSubmitted,
+            score: currentAttempt.score || 0,
+            totalQuestions: currentAttempt.totalQuestions,
+            percentage: currentAttempt.percentage || 0,
+            submittedAt: currentAttempt.submittedAt,
+            autoSubmitted: currentAttempt.autoSubmitted,
             details: detailedResults,
+            allAttempts: attemptsSummary,
+            currentAttemptId: currentAttempt.id
         })
     } catch (error) {
         console.error("Get student result error:", error)

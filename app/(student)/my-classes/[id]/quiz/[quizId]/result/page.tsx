@@ -15,6 +15,7 @@ interface DetailedQuestion {
   options: string[] | null
   userAnswer: string | boolean | null
   correctAnswer: string | boolean
+  explanation?: string | null
   isCorrect: boolean
   points: number
 }
@@ -195,15 +196,15 @@ export default function ClassQuizResultPage() {
                             <div
                               key={val}
                               className={`text-sm px-3 py-1.5 rounded flex items-center gap-2 ${
-                                val === String(q.correctAnswer)
+                                String(val).toLowerCase() === String(q.correctAnswer).toLowerCase()
                                   ? "bg-green-100 dark:bg-green-800/30 text-green-800 dark:text-green-200"
-                                  : val === String(q.userAnswer) && !q.isCorrect
+                                  : String(val).toLowerCase() === String(q.userAnswer).toLowerCase() && !q.isCorrect
                                     ? "bg-red-100 dark:bg-red-800/30 text-red-800 dark:text-red-200"
                                     : "bg-muted/50"
                               }`}
                             >
                               <Circle className={`h-3 w-3 ${
-                                val === String(q.userAnswer) ? "fill-current" : ""
+                                String(val).toLowerCase() === String(q.userAnswer).toLowerCase() ? "fill-current" : ""
                               }`} />
                               <span>{val}</span>
                             </div>
@@ -212,12 +213,20 @@ export default function ClassQuizResultPage() {
                       )}
 
                       {/* Summary */}
-                      <div className="text-xs text-muted-foreground">
+                      <div className="text-xs text-muted-foreground mb-2">
                         Your answer: <strong>{formatAnswer(q, q.userAnswer)}</strong>
                         {!q.isCorrect && (
                           <> • Correct: <strong className="text-green-600">{formatAnswer(q, q.correctAnswer)}</strong></>
                         )}
                       </div>
+
+                      {/* Explanation */}
+                      {q.explanation && (
+                        <div className="bg-muted/50 p-3 rounded-md text-sm border-l-4 border-primary/50">
+                          <span className="font-semibold text-primary block mb-1">Explanation:</span>
+                          <span className="text-muted-foreground">{q.explanation}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

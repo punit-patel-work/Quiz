@@ -248,8 +248,9 @@ export default function QuizResultsPage() {
                 <thead className="border-b">
                   <tr className="text-left text-sm text-muted-foreground">
                     <th className="py-3 px-2">Student</th>
+                    <th className="py-3 px-2 text-center">Attempts</th>
                     <th className="py-3 px-2">Status</th>
-                    <th className="py-3 px-2 text-center">Score</th>
+                    <th className="py-3 px-2 text-center">Best Score</th>
                     <th className="py-3 px-2 text-center">Percentage</th>
                     <th className="py-3 px-2">Submitted</th>
                     <th className="py-3 px-2 text-right">Actions</th>
@@ -263,6 +264,9 @@ export default function QuizResultsPage() {
                           <div className="font-medium">{r.name || "—"}</div>
                           <div className="text-sm text-muted-foreground">{r.email}</div>
                         </div>
+                      </td>
+                      <td className="py-3 px-2 text-center">
+                        {r.hasAttempted ? r.attemptsCount : "—"}
                       </td>
                       <td className="py-3 px-2">
                         <StatusBadge status={r.status} autoSubmitted={r.autoSubmitted} />
