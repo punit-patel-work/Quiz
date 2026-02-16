@@ -1,19 +1,22 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { useQuizStore } from "@/lib/store"
 import { QuestionRenderer } from "@/components/quiz/question-renderer"
 import { Timer } from "@/components/quiz/timer"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChevronLeft, ChevronRight, Send } from "lucide-react"
+import { ChevronLeft, ChevronRight, Send, Maximize2, Minimize2 } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
+import { motion, AnimatePresence } from "framer-motion"
 
 export default function QuizPage() {
   const router = useRouter()
   const { toast } = useToast()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [zenMode, setZenMode] = useState(false)
+
   const {
     quizId,
     quizName,
@@ -28,9 +31,8 @@ export default function QuizPage() {
     previousQuestion,
     getTimeTaken,
     setAnswer,
+    goToQuestion,
   } = useQuizStore()
-
-  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Initialize quiz
   useEffect(() => {
@@ -62,15 +64,29 @@ export default function QuizPage() {
     }
   }, [timeRemaining])
 
-  const handleSubmit = async () => {
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight" && currentQuestionIndex < questions.length - 1) {
+        nextQuestion()
+      } else if (e.key === "ArrowLeft" && currentQuestionIndex > 0) {
+        previousQuestion()
+      } else if (e.key === "Enter" && e.metaKey) { // Cmd+Enter to submit
+        handleSubmit()
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [currentQuestionIndex, questions.length])
+
+  const handleSubmit = useCallback(async () => {
     if (isSubmitting) return
-    
     setIsSubmitting(true)
 
     try {
       const timeTaken = getTimeTaken()
       
-      // Convert Map to array format for API
       const answersArray = Array.from(userAnswers.entries()).map(
         ([questionId, userAnswer]) => ({
           questionId,
@@ -103,10 +119,18 @@ export default function QuizPage() {
       })
       setIsSubmitting(false)
     }
-  }
+  }, [isSubmitting, getTimeTaken, userAnswers, quizId, timeRemaining, router, toast])
 
   const handleAnswerChange = (answer: string | boolean) => {
-    setAnswer(currentQuestion.id, answer)
+    const question = questions[currentQuestionIndex]
+    if (question) {
+      setAnswer(question.id, answer)
+      
+      // Auto-advance after small delay (optional "flow" feature)
+      // setTimeout(() => {
+      //   if (currentQuestionIndex < questions.length - 1) nextQuestion()
+      // }, 800)
+    }
   }
 
   const currentQuestion = questions[currentQuestionIndex]
@@ -114,115 +138,124 @@ export default function QuizPage() {
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100
   const answeredCount = userAnswers.size
 
-  if (questions.length === 0) {
-    return null
-  }
+  if (questions.length === 0) return null
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-4xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold">{quizName || "Quiz"}</h1>
-            <p className="text-muted-foreground">
-              Question {currentQuestionIndex + 1} of {questions.length}
-            </p>
+    <div className={`min-h-screen transition-colors duration-500 ${zenMode ? 'bg-background' : 'bg-muted/30'}`}>
+      {/* Top Bar */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <h1 className="font-semibold text-lg truncate max-w-[200px] sm:max-w-md">
+              {quizName || "Quiz Session"}
+            </h1>
+            <span className="text-sm text-muted-foreground hidden sm:inline-block">
+              {currentQuestionIndex + 1} / {questions.length}
+            </span>
           </div>
-          <Timer />
-        </div>
 
-        {/* Progress */}
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm text-muted-foreground">
-            <span>{answeredCount} answered</span>
-            <span>{questions.length - answeredCount} remaining</span>
-          </div>
-          <Progress value={progress} />
-        </div>
-
-        {/* Question */}
-        {currentQuestion && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">
-                Question {currentQuestionIndex + 1}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <QuestionRenderer 
-                question={currentQuestion}
-                answer={currentAnswer ?? null}
-                onAnswerChange={handleAnswerChange}
-              />
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Navigation */}
-        <div className="flex items-center justify-between gap-4">
-          <Button
-            variant="outline"
-            onClick={previousQuestion}
-            disabled={currentQuestionIndex === 0}
-          >
-            <ChevronLeft className="mr-2 h-4 w-4" />
-            Previous
-          </Button>
-
-          {currentQuestionIndex < questions.length - 1 ? (
-            <Button onClick={nextQuestion}>
-              Next
-              <ChevronRight className="ml-2 h-4 w-4" />
-            </Button>
-          ) : (
+          <div className="flex items-center gap-4">
+            <Timer />
             <Button
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-              className="bg-green-600 hover:bg-green-700"
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                setZenMode(!zenMode)
+                if (!document.fullscreenElement) {
+                  document.documentElement.requestFullscreen().catch(e => console.error(e))
+                } else {
+                  if (document.exitFullscreen) {
+                    document.exitFullscreen()
+                  }
+                }
+              }}
+              title="Toggle Zen Mode"
             >
-              <Send className="mr-2 h-4 w-4" />
-              {isSubmitting ? "Submitting..." : "Submit Quiz"}
+              {zenMode ? <Minimize2 className="h-5 w-5" /> : <Maximize2 className="h-5 w-5" />}
             </Button>
-          )}
+          </div>
         </div>
+        
+        {/* Progress Line */}
+        <motion.div 
+          className="h-1 bg-primary origin-left" 
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: progress / 100 }}
+          transition={{ duration: 0.5, ease: "circOut" }}
+        />
+      </header>
+      
+      {/* Main Content */}
+      <main className="container mx-auto px-4 py-24 md:py-32 max-w-3xl">
+        <div className="space-y-12">
+          {currentQuestion && (
+            <QuestionRenderer 
+              question={currentQuestion}
+              answer={currentAnswer ?? null}
+              onAnswerChange={handleAnswerChange}
+            />
+          )}
 
-        {/* Quick Navigation */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm">Quick Navigation</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-10 gap-2">
-              {questions.map((_: any, index: number) => {
-                const isAnswered = Array.from(userAnswers.keys()).includes(
-                  questions[index].id
-                )
-                const isCurrent = index === currentQuestionIndex
+          {/* Navigation Controls */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-8 border-t">
+            <Button
+              variant="ghost"
+              size="lg"
+              onClick={previousQuestion}
+              disabled={currentQuestionIndex === 0}
+              className="w-full sm:w-auto text-muted-foreground hover:text-foreground"
+            >
+              <ChevronLeft className="mr-2 h-5 w-5" />
+              Previous
+            </Button>
 
-                return (
-                  <button
-                    key={index}
-                    onClick={() => useQuizStore.getState().goToQuestion(index)}
-                    className={`
-                      aspect-square rounded-md text-sm font-medium transition-colors
-                      ${
-                        isCurrent
-                          ? "bg-primary text-primary-foreground"
-                          : isAnswered
-                          ? "bg-green-100 text-green-900 dark:bg-green-900 dark:text-green-100"
-                          : "bg-muted hover:bg-muted/80"
-                      }
-                    `}
-                  >
-                    {index + 1}
-                  </button>
-                )
-              })}
+            <div className="flex gap-2">
+                {/* Dots Indicator */}
+                <div className="hidden md:flex gap-1.5 items-center">
+                    {questions.map((_, i) => (
+                        <motion.button
+                            key={i}
+                            whileHover={{ scale: 1.2 }}
+                            onClick={() => goToQuestion(i)}
+                            className={`h-2 w-2 rounded-full transition-colors ${
+                                i === currentQuestionIndex ? "bg-primary" : 
+                                userAnswers.has(questions[i].id) ? "bg-primary/30" : "bg-muted"
+                            }`}
+                        />
+                    ))}
+                </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+
+            {currentQuestionIndex < questions.length - 1 ? (
+              <Button 
+                size="lg" 
+                onClick={nextQuestion}
+                className="w-full sm:w-auto px-8"
+              >
+                Next Question
+                <ChevronRight className="ml-2 h-5 w-5" />
+              </Button>
+            ) : (
+              <Button
+                size="lg"
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="w-full sm:w-auto px-8 bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black"
+              >
+                {isSubmitting ? "Submitting..." : "Complete Quiz"}
+                <Send className="ml-2 h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        </div>
+      </main>
+
+      {/* Keyboard Shortcuts Hint */}
+      {!zenMode && (
+        <div className="fixed bottom-4 right-4 text-xs text-muted-foreground hidden lg:block opacity-50 hover:opacity-100 transition-opacity">
+          Press <kbd className="px-1 py-0.5 rounded border bg-muted">←</kbd> <kbd className="px-1 py-0.5 rounded border bg-muted">→</kbd> to navigate
+        </div>
+      )}
     </div>
   )
 }

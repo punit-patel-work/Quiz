@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { sendEmail } from "@/lib/email"
+import { createNotification } from "@/lib/notifications"
 
 // POST /api/classes/[id]/invite - Invite students by email
 export async function POST(
@@ -135,6 +136,16 @@ export async function POST(
                         expiresAt,
                     },
                 })
+
+                if (existingUser) {
+                    await createNotification({
+                        userId: existingUser.id,
+                        title: "Class Invitation",
+                        message: `You have been invited to join ${classData.name}.`,
+                        link: "/invitations",
+                        type: "INFO",
+                    })
+                }
 
                 // Send email
                 const isExistingUser = !!existingUser

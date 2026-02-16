@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { auth } from "@/auth"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { UserNav } from "@/components/auth/user-nav"
+import { NotificationBell } from "@/components/layout/notification-bell"
 import Link from "next/link"
 import "./globals.css"
 
@@ -46,7 +47,10 @@ export default async function RootLayout({
                   <div className="flex items-center gap-4">
                     <ThemeToggle />
                     {session?.user ? (
-                      <UserNav user={session.user} />
+                      <>
+                        <NotificationBell />
+                        <UserNav user={session.user} />
+                      </>
                     ) : (
                       <nav className="flex items-center gap-4">
                         <Link

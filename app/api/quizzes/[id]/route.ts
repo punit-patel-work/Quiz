@@ -77,7 +77,13 @@ export async function DELETE(
             )
         }
 
-        // Delete quiz (results will cascade delete)
+        // Save quiz name into results so they remain meaningful after deletion
+        await prisma.quizResult.updateMany({
+            where: { quizId: params.id },
+            data: { quizName: quiz.name },
+        })
+
+        // Delete quiz (results will be preserved with quizId set to null)
         await prisma.quiz.delete({
             where: { id: params.id },
         })

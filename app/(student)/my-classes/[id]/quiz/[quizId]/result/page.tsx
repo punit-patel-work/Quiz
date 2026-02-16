@@ -191,21 +191,21 @@ export default function ClassQuizResultPage() {
                       {/* Show for true/false */}
                       {q.questionType === "true_false" && (
                         <div className="flex gap-2 mb-3">
-                          {[true, false].map((val) => (
+                          {["True", "False"].map((val) => (
                             <div
-                              key={String(val)}
+                              key={val}
                               className={`text-sm px-3 py-1.5 rounded flex items-center gap-2 ${
-                                val === q.correctAnswer
+                                val === String(q.correctAnswer)
                                   ? "bg-green-100 dark:bg-green-800/30 text-green-800 dark:text-green-200"
-                                  : val === q.userAnswer && !q.isCorrect
+                                  : val === String(q.userAnswer) && !q.isCorrect
                                     ? "bg-red-100 dark:bg-red-800/30 text-red-800 dark:text-red-200"
                                     : "bg-muted/50"
                               }`}
                             >
                               <Circle className={`h-3 w-3 ${
-                                val === q.userAnswer ? "fill-current" : ""
+                                val === String(q.userAnswer) ? "fill-current" : ""
                               }`} />
-                              <span>{val ? "True" : "False"}</span>
+                              <span>{val}</span>
                             </div>
                           ))}
                         </div>

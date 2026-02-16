@@ -133,3 +133,104 @@ export async function sendEmail({ to, subject, html, text }: SendEmailParams) {
     return { success: false, error }
   }
 }
+
+interface SendPasswordResetEmailParams {
+  to: string
+  token: string
+  baseUrl: string
+}
+
+export async function sendPasswordResetEmail({ to, token, baseUrl }: SendPasswordResetEmailParams) {
+  const resetUrl = `${baseUrl}/reset-password?token=${token}`
+
+  const mailOptions = {
+    from: `"Quiz Platform" <${process.env.GMAIL_USER}>`,
+    to,
+    subject: 'Reset Your Password',
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              line-height: 1.6;
+              color: #333;
+            }
+            .container {
+              max-width: 600px;
+              margin: 0 auto;
+              padding: 20px;
+            }
+            .header {
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              color: white;
+              padding: 30px;
+              text-align: center;
+              border-radius: 10px 10px 0 0;
+            }
+            .content {
+              background: #f9f9f9;
+              padding: 30px;
+              border-radius: 0 0 10px 10px;
+            }
+            .button {
+              display: inline-block;
+              padding: 12px 30px;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              color: white;
+              text-decoration: none;
+              border-radius: 5px;
+              margin: 20px 0;
+            }
+            .footer {
+              text-align: center;
+              margin-top: 20px;
+              color: #666;
+              font-size: 12px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>Password Reset Request 🔐</h1>
+            </div>
+            <div class="content">
+              <h2>Reset Your Password</h2>
+              <p>We received a request to reset your password. Click the button below to create a new password.</p>
+              <div style="text-align: center;">
+                <a href="${resetUrl}" class="button">Reset Password</a>
+              </div>
+              <p>Or copy and paste this link into your browser:</p>
+              <p style="word-break: break-all; color: #667eea;">${resetUrl}</p>
+              <p><strong>This link will expire in 1 hour.</strong></p>
+              <p>If you didn't request a password reset, you can safely ignore this email. Your password will remain unchanged.</p>
+            </div>
+            <div class="footer">
+              <p>© ${new Date().getFullYear()} Quiz Platform. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `,
+    text: `
+      Password Reset Request
+
+      We received a request to reset your password. Visit the link below to create a new password:
+      ${resetUrl}
+
+      This link will expire in 1 hour.
+
+      If you didn't request a password reset, you can safely ignore this email.
+    `,
+  }
+
+  try {
+    await transporter.sendMail(mailOptions)
+    return { success: true }
+  } catch (error) {
+    console.error('Error sending password reset email:', error)
+    return { success: false, error }
+  }
+}

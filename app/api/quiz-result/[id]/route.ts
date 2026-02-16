@@ -34,6 +34,23 @@ export async function GET(
             )
         }
 
+        // If quiz was deleted, return basic result info without detailed breakdown
+        if (!result.quiz) {
+            return NextResponse.json({
+                id: result.id,
+                score: result.score,
+                totalQuestions: result.totalQuestions,
+                percentage: result.percentage,
+                quizData: [],
+                results: [],
+                quizName: result.quizName || "Deleted Quiz",
+                timeLimit: result.timeLimit,
+                timeTaken: result.timeTaken,
+                createdAt: result.createdAt,
+                quizDeleted: true,
+            })
+        }
+
         const questions = result.quiz.questions as any[]
         const optimizedAnswers = result.userAnswers as { questionId: number; answer: string | boolean | null }[]
 

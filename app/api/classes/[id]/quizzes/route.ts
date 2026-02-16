@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
+import { createClassNotification } from "@/lib/notifications"
 
 // GET /api/classes/[id]/quizzes - List class quizzes
 export async function GET(
@@ -211,7 +212,18 @@ export async function POST(
                 endTime: end,
                 showResults: showResults ?? true,
                 shuffleQuestions: shuffleQuestions ?? false,
+                maxAttempts: body.maxAttempts || 1,
             },
+        })
+
+        // Notify class members
+        await createClassNotification({
+            classId: params.id,
+            title: "New Quiz Assigned",
+            message: `A new quiz "${quiz.name}" has been assigned in ${classData.name}.`,
+            type: "INFO",
+            link: `/my-classes/${params.id}/quiz/${quiz.id}`,
+            excludeUserId: session.user.id,
         })
 
         return NextResponse.json(quiz, { status: 201 })

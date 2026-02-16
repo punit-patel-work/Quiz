@@ -1,10 +1,5 @@
-"use client"
-
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+import { motion, AnimatePresence } from "framer-motion"
+import { OptionCard } from "./option-card"
 import { Question } from "@/lib/quiz-validator"
 
 interface QuestionRendererProps {
@@ -14,95 +9,62 @@ interface QuestionRendererProps {
 }
 
 export function QuestionRenderer({ question, answer, onAnswerChange }: QuestionRendererProps) {
-  const renderQuestionContent = () => {
-    switch (question.type) {
-      case "multiple_choice":
-        return (
-          <RadioGroup
-            value={answer as string || ""}
-            onValueChange={(value) => onAnswerChange(value)}
-          >
-            <div className="space-y-3">
-              {question.options?.map((option, index) => (
-                <div
-                  key={index}
-                  className="flex items-center space-x-3 rounded-lg border p-4 hover:bg-accent transition-colors cursor-pointer"
-                >
-                  <RadioGroupItem value={option} id={`option-${index}`} />
-                  <Label
-                    htmlFor={`option-${index}`}
-                    className="flex-1 cursor-pointer font-normal"
-                  >
-                    {option}
-                  </Label>
-                </div>
-              ))}
-            </div>
-          </RadioGroup>
-        )
-
-      case "true_false":
-        return (
-          <div className="space-y-3">
-            <Button
-              type="button"
-              variant={answer === true ? "default" : "outline"}
-              className="w-full justify-start h-auto p-4"
-              onClick={() => onAnswerChange(true)}
-            >
-              <span className="text-lg">True</span>
-            </Button>
-            <Button
-              type="button"
-              variant={answer === false ? "default" : "outline"}
-              className="w-full justify-start h-auto p-4"
-              onClick={() => onAnswerChange(false)}
-            >
-              <span className="text-lg">False</span>
-            </Button>
-          </div>
-        )
-
-      case "fill_in_the_blank":
-        return (
-          <div className="space-y-2">
-            <Label htmlFor="answer">Your Answer</Label>
-            <Input
-              id="answer"
-              type="text"
-              placeholder="Type your answer here..."
-              value={answer as string || ""}
-              onChange={(e) => onAnswerChange(e.target.value)}
-              className="text-lg p-6"
-            />
-            <p className="text-sm text-muted-foreground">
-              Answer is case-insensitive
-            </p>
-          </div>
-        )
-
-      default:
-        return null
-    }
-  }
+  // Generate labels (A, B, C, D...)
+  const getLabel = (index: number) => String.fromCharCode(65 + index)
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-primary bg-primary/10 px-3 py-1 rounded-full">
-            {question.topic}
-          </span>
-          <span className="text-sm text-muted-foreground">
-            Question {question.id}
-          </span>
-        </div>
-        <CardTitle className="text-xl">{question.question}</CardTitle>
-        <CardDescription className="capitalize">
-          {question.type.replace("_", " ")}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>{renderQuestionContent()}</CardContent>
-    </Card>
+    <div className="space-y-8">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={question.id}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.3 }}
+          className="space-y-6"
+        >
+          {/* Question Text */}
+          <h2 className="text-2xl md:text-3xl font-bold leading-tight text-foreground">
+            {question.question}
+          </h2>
+
+          {/* Options Grid for MCQ and True/False */}
+          {(question.type === "multiple_choice" || question.type === "true_false") && (
+            <div className="grid gap-3 sm:grid-cols-1 md:grid-cols-2">
+              {(question.type === "true_false" ? ["True", "False"] : question.options || []).map((option, index) => (
+                <OptionCard
+                  key={`${question.id}-${index}`}
+                  index={index}
+                  label={getLabel(index)}
+                  content={option}
+                  isSelected={answer === option}
+                  onClick={() => onAnswerChange(option)}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Input for Fill in the Blank */}
+          {question.type === "fill_in_the_blank" && (
+            <div className="space-y-4">
+              <div className="relative">
+                <input
+                  type="text"
+                  value={(answer as string) || ""}
+                  onChange={(e) => onAnswerChange(e.target.value)}
+                  placeholder="Type your answer here..."
+                  className="w-full p-4  text-lg bg-background border-2 border-muted rounded-xl focus:border-primary focus:outline-none transition-colors"
+                  autoFocus
+                />
+                <div className="absolute inset-0 rounded-xl pointer-events-none ring-offset-2 peer-focus:ring-2 peer-focus:ring-primary" />
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Press Enter to submit (if last question) or Arrow Right to skip.
+              </p>
+            </div>
+          )}
+        </motion.div>
+      </AnimatePresence>
+    </div>
   )
 }

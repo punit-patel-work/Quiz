@@ -16,6 +16,10 @@ export function optimizeAnswers(
 /**
  * Reconstruct full results from quiz questions and optimized answers
  */
+import { checkAnswer } from "./scoring"
+
+// ...
+
 export function reconstructResults(
     questions: Question[],
     optimizedAnswers: { questionId: number; answer: string | boolean | null }[]
@@ -26,29 +30,7 @@ export function reconstructResults(
 
     return questions.map((question) => {
         const userAnswer = answersMap.get(question.id) ?? null
-        let isCorrect = false
-
-        if (question.type === "multiple_choice") {
-            isCorrect = userAnswer === question.correct_answer
-        } else if (question.type === "true_false") {
-            isCorrect = userAnswer === question.correct_answer
-        } else if (question.type === "fill_in_the_blank") {
-            const rawAnswers = Array.isArray(question.correct_answer)
-                ? question.correct_answer
-                : [question.correct_answer]
-
-            // Filter to only string answers and normalize
-            const correctAnswers = rawAnswers
-                .filter((ans): ans is string => typeof ans === "string")
-
-            const normalizedUserAnswer = typeof userAnswer === "string"
-                ? userAnswer.trim().toLowerCase()
-                : ""
-
-            isCorrect = correctAnswers.some(
-                (ans) => ans.trim().toLowerCase() === normalizedUserAnswer
-            )
-        }
+        const isCorrect = checkAnswer(question, userAnswer)
 
         return {
             questionId: question.id,

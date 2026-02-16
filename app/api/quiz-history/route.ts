@@ -31,7 +31,7 @@ export async function GET() {
             totalQuestions: result.totalQuestions,
             percentage: result.percentage,
             createdAt: result.createdAt,
-            quizName: result.quiz.name,
+            quizName: result.quiz?.name || result.quizName || "Deleted Quiz",
         }))
 
         return NextResponse.json(formattedResults)

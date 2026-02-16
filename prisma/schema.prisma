@@ -34,6 +34,7 @@ model User {
   scoreModifications ScoreModification[] @relation("ModifiedBy")
   retakesGranted     QuizRetake[]       @relation("RetakeGrantedBy")
   correctionsApplied QuestionCorrection[] @relation("CorrectionAppliedBy")
+  notifications      Notification[]
 
   @@map("users")
 }
@@ -63,10 +64,27 @@ model Quiz {
   @@index([createdAt])
 }
 
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      String   @default("INFO") // INFO, SUCCESS, WARNING, ERROR
+  link      String?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("notifications")
+}
+
 model QuizResult {
   id              String   @id @default(cuid())
   userId          String
-  quizId          String
+  quizId          String?
+  quizName        String?  // Saved copy so results remain meaningful after quiz deletion
   score           Int
   totalQuestions  Int
   percentage      Float
@@ -76,7 +94,7 @@ model QuizResult {
   createdAt       DateTime @default(now())
 
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  quiz            Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  quiz            Quiz?    @relation(fields: [quizId], references: [id], onDelete: SetNull)
 
   @@index([userId])
   @@index([quizId])
@@ -151,6 +169,7 @@ model ClassQuiz {
   showResults      Boolean  @default(true)
   shuffleQuestions Boolean  @default(false)
   allowRetakes     Boolean  @default(true) // Whether retakes can be granted
+  maxAttempts      Int      @default(1) // Number of attempts allowed (1 = single try)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
@@ -330,4 +349,16 @@ model SystemSettings {
   updatedAt           DateTime @updatedAt
 
   @@map("system_settings")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expires   DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([token])
+  @@map("password_reset_tokens")
 }

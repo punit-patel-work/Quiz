@@ -18,7 +18,7 @@ export function checkAnswer(question: Question, userAnswer: string | boolean | n
 
     // Handle true/false questions
     if (question.type === 'true_false') {
-        return userAnswer === correctAnswer
+        return String(userAnswer).toLowerCase() === String(correctAnswer).toLowerCase()
     }
 
     // Handle multiple choice
