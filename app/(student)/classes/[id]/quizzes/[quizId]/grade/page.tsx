@@ -20,6 +20,8 @@ import {
   FileText,
   ChevronDown,
   ChevronUp,
+  Eye,
+  EyeOff
 } from "lucide-react"
 import { format } from "date-fns"
 import { motion, AnimatePresence } from "framer-motion"
@@ -58,6 +60,7 @@ export default function GradeQuizPage() {
   const [grades, setGrades] = useState<Map<string, Map<number, { score: number; feedback: string }>>>(new Map())
   const [savingAttempt, setSavingAttempt] = useState<string | null>(null)
   const [lastSavedAttempt, setLastSavedAttempt] = useState<string | null>(null)
+  const [showModelAnswerFor, setShowModelAnswerFor] = useState<number[]>([])
 
   const params = useParams()
   const router = useRouter()
@@ -175,6 +178,14 @@ export default function GradeQuizPage() {
     } finally {
       setSavingAttempt(null)
     }
+  }
+
+  const toggleModelAnswer = (questionId: number) => {
+    setShowModelAnswerFor(prev => 
+      prev.includes(questionId) 
+        ? prev.filter(id => id !== questionId)
+        : [...prev, questionId]
+    )
   }
 
   if (isLoading) {
@@ -327,16 +338,40 @@ export default function GradeQuizPage() {
 
                             {/* Model Answer (if provided) */}
                             {da.modelAnswer && (
-                              <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                                <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mb-1">
-                                  Model Answer (Reference)
-                                </p>
-                                <p className="text-sm">{da.modelAnswer}</p>
+                              <div className="space-y-2">
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/30 -ml-2 h-8"
+                                  onClick={() => toggleModelAnswer(da.questionId)}
+                                >
+                                  {showModelAnswerFor.includes(da.questionId) ? (
+                                    <><EyeOff className="h-3 w-3 mr-2" /> Hide Reference Answer</>
+                                  ) : (
+                                    <><Eye className="h-3 w-3 mr-2" /> Show Reference Answer</>
+                                  )}
+                                </Button>
+
+                                <AnimatePresence>
+                                  {showModelAnswerFor.includes(da.questionId) && (
+                                    <motion.div 
+                                      initial={{ opacity: 0, height: 0 }}
+                                      animate={{ opacity: 1, height: 'auto' }}
+                                      exit={{ opacity: 0, height: 0 }}
+                                      className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 overflow-hidden"
+                                    >
+                                      <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mb-1">
+                                        Model Answer (Reference)
+                                      </p>
+                                      <p className="text-sm">{da.modelAnswer}</p>
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
                               </div>
                             )}
 
                             {/* Student's Answer */}
-                            <div className="bg-muted/50 rounded-lg p-4">
+                            <div className="bg-muted/50 rounded-lg p-4 mt-4">
                               <p className="text-xs font-semibold text-muted-foreground mb-1">
                                 Student's Answer
                               </p>
@@ -346,7 +381,7 @@ export default function GradeQuizPage() {
                             </div>
 
                             {/* Grading Controls */}
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
                               <div className="space-y-2">
                                 <Label className="text-xs">Score (0 - {da.maxScore})</Label>
                                 <Input

@@ -211,17 +211,21 @@ export default function ClassesPage() {
 
         {/* Classes Grid */}
         {classes.length === 0 ? (
-          <Card className="border-dashed">
-            <CardContent className="py-12 text-center">
-              <GraduationCap className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No classes yet</h3>
-              <p className="text-muted-foreground mb-6">
-                Create your first class to start inviting students
+          <Card className="border-dashed bg-muted/30">
+            <CardContent className="py-16 text-center space-y-4">
+              <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+                <GraduationCap className="h-8 w-8 text-muted-foreground" />
+              </div>
+              <h3 className="text-xl font-semibold">No classes yet</h3>
+              <p className="text-muted-foreground max-w-sm mx-auto">
+                Classes are where you organize your students and assign quizzes. Get started by creating your first one.
               </p>
-              <Button onClick={() => setDialogOpen(true)}>
-                <Plus className="mr-2 h-4 w-4" />
-                Create Your First Class
-              </Button>
+              <div className="pt-4">
+                <Button size="lg" onClick={() => setDialogOpen(true)}>
+                  <Plus className="mr-2 h-5 w-5" />
+                  Create Your First Class
+                </Button>
+              </div>
             </CardContent>
           </Card>
         ) : (

@@ -7,6 +7,7 @@ import { auth } from "@/auth"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { UserNav } from "@/components/auth/user-nav"
 import { NotificationBell } from "@/components/layout/notification-bell"
+import { SiteFooter } from "@/components/layout/site-footer"
 import Link from "next/link"
 import "./globals.css"
 
@@ -15,8 +16,10 @@ const inter = Inter({ subsets: ["latin"] })
 import Image from "next/image"
 
 export const metadata: Metadata = {
-  title: "Quiz Platform - Test Your Knowledge",
-  description: "Upload custom JSON quizzes and test your knowledge",
+  title: "QuizFlow | Open Source Quiz Platform for Teachers",
+  description: "Create, assign, and automatically grade quizzes. Support for JSON uploads, multiple choice, and descriptive manual grading.",
+  keywords: ["quiz platform", "open source", "teacher tools", "json quizzes", "grading", "education"],
+  authors: [{ name: "QuizFlow Team" }],
   icons: {
     icon: "/favicon.svg",
   },
@@ -86,12 +89,8 @@ export default async function RootLayout({
                 {children}
               </main>
 
-              {/* Footer */}
-              <footer className="border-t py-6 mt-12">
-                <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-                  <p>© {new Date().getFullYear()} Quiz Platform. All rights reserved.</p>
-                </div>
-              </footer>
+              {/* Enhanced Footer */}
+              <SiteFooter />
             </div>
             <Toaster />
           </ThemeProvider>

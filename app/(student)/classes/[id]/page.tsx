@@ -444,10 +444,23 @@ export default function ClassDashboardPage() {
             </div>
 
             {quizzes.length === 0 ? (
-              <Card className="border-dashed">
-                <CardContent className="py-8 text-center">
-                  <BookOpen className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
-                  <p className="text-muted-foreground">No quizzes yet. Create your first quiz!</p>
+              <Card className="border-dashed bg-muted/30">
+                <CardContent className="py-12 text-center space-y-4">
+                  <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+                    <BookOpen className="h-8 w-8 text-muted-foreground" />
+                  </div>
+                  <h3 className="text-xl font-semibold">No quizzes yet</h3>
+                  <p className="text-muted-foreground max-w-sm mx-auto">
+                    Create your first quiz to engage your students and track their progress.
+                  </p>
+                  <div className="pt-4">
+                    <Button asChild>
+                      <Link href={`/classes/${classId}/quizzes/create`}>
+                        <Plus className="mr-2 h-5 w-5" />
+                        Create Your First Quiz
+                      </Link>
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             ) : (
@@ -483,10 +496,21 @@ export default function ClassDashboardPage() {
           {/* Students Tab */}
           <TabsContent value="students" className="space-y-4">
             {members.length === 0 ? (
-              <Card className="border-dashed">
-                <CardContent className="py-8 text-center">
-                  <Users className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
-                  <p className="text-muted-foreground">No students yet. Invite some!</p>
+              <Card className="border-dashed bg-muted/30">
+                <CardContent className="py-12 text-center space-y-4">
+                  <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+                    <Users className="h-8 w-8 text-muted-foreground" />
+                  </div>
+                  <h3 className="text-xl font-semibold">No students yet</h3>
+                  <p className="text-muted-foreground max-w-sm mx-auto">
+                    Invite students to this class so they can access your quizzes.
+                  </p>
+                  <div className="pt-4">
+                    <Button onClick={() => setInviteDialogOpen(true)}>
+                      <UserPlus className="mr-2 h-5 w-5" />
+                      Invite Students
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             ) : (
@@ -534,10 +558,15 @@ export default function ClassDashboardPage() {
           {/* Invitations Tab */}
           <TabsContent value="invitations" className="space-y-4">
             {invitations.length === 0 ? (
-              <Card className="border-dashed">
-                <CardContent className="py-8 text-center">
-                  <Mail className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
-                  <p className="text-muted-foreground">No invitations sent yet.</p>
+              <Card className="border-dashed bg-muted/30">
+                <CardContent className="py-12 text-center space-y-4">
+                  <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+                    <Mail className="h-8 w-8 text-muted-foreground" />
+                  </div>
+                  <h3 className="text-xl font-semibold">No pending invitations</h3>
+                  <p className="text-muted-foreground max-w-sm mx-auto">
+                    You haven't sent any invitations yet, or all students have already joined.
+                  </p>
                 </CardContent>
               </Card>
             ) : (
