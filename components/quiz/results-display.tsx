@@ -72,6 +72,7 @@ export function ResultsDisplay({
         {questions.map((question, index) => {
           const result = results.find((r) => r.questionId === question.id)
           const isCorrect = result?.isCorrect || false
+          const isDescriptive = result?.isDescriptive || question.type === 'descriptive'
 
           let correctAnswerText: string
           if (typeof question.correct_answer === 'boolean') {
@@ -79,7 +80,7 @@ export function ResultsDisplay({
           } else if (Array.isArray(question.correct_answer)) {
             correctAnswerText = question.correct_answer.join(' / ')
           } else {
-            correctAnswerText = question.correct_answer
+            correctAnswerText = question.correct_answer || ''
           }
 
           let userAnswerText = result?.userAnswer !== null && result?.userAnswer !== undefined
@@ -88,6 +89,57 @@ export function ResultsDisplay({
 
           if (typeof result?.userAnswer === 'boolean') {
             userAnswerText = result.userAnswer ? 'True' : 'False'
+          }
+
+          // Descriptive question rendering
+          if (isDescriptive) {
+            return (
+              <Card
+                key={question.id}
+                className="border-l-4 border-l-amber-500"
+              >
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-xs px-2 py-1 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 font-medium">
+                          Descriptive
+                        </span>
+                        <span className="text-sm font-medium">
+                          Question {question.id}
+                        </span>
+                        <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
+                          {question.topic}
+                        </span>
+                      </div>
+                      <CardTitle className="text-lg">{question.question}</CardTitle>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="bg-muted/50 rounded-lg p-4">
+                    <p className="text-sm font-medium mb-1">Your Answer:</p>
+                    <p className="text-sm whitespace-pre-wrap">{userAnswerText}</p>
+                  </div>
+                  {(result as any)?.descriptiveGrade && (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">Score:</span>
+                        <span className="text-sm font-bold text-primary">
+                          {(result as any).descriptiveGrade.score}/{(result as any).descriptiveGrade.maxScore}
+                        </span>
+                      </div>
+                      {(result as any).descriptiveGrade.feedback && (
+                        <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                          <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mb-1">Teacher Feedback</p>
+                          <p className="text-sm">{(result as any).descriptiveGrade.feedback}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )
           }
 
           return (
@@ -134,10 +186,12 @@ export function ResultsDisplay({
                     </div>
                   )}
                 </div>
-                <div className="bg-muted p-4 rounded-lg">
-                  <p className="text-sm font-medium mb-1">Explanation:</p>
-                  <p className="text-sm text-muted-foreground">{question.explanation}</p>
-                </div>
+                {question.explanation && (
+                  <div className="bg-muted p-4 rounded-lg">
+                    <p className="text-sm font-medium mb-1">Explanation:</p>
+                    <p className="text-sm text-muted-foreground">{question.explanation}</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           )

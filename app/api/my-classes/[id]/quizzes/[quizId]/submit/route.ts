@@ -97,13 +97,16 @@ export async function POST(
         )
 
         const results = calculateScore(questions, answersMap)
-        console.log("Submit quiz - calculated score:", results.score, "/", results.totalQuestions)
+        console.log("Submit quiz - calculated score:", results.score, "/", results.totalQuestions, "hasDescriptive:", results.hasDescriptive)
 
         // Optimize answers for storage
         const optimizedAnswers = (userAnswers || []).map((item: any) => ({
             questionId: item.questionId,
             answer: item.userAnswer,
         }))
+
+        // Determine grading status
+        const gradingStatus = results.hasDescriptive ? "pending" : "none"
 
         // Update attempt
         const updatedAttempt = await prisma.classQuizAttempt.update({
@@ -115,10 +118,11 @@ export async function POST(
                 submittedAt: now,
                 autoSubmitted,
                 status: "submitted",
+                gradingStatus,
             },
         })
 
-        console.log("Submit quiz - Success, updated attempt:", updatedAttempt.id)
+        console.log("Submit quiz - Success, updated attempt:", updatedAttempt.id, "gradingStatus:", gradingStatus)
 
         return NextResponse.json({
             message: autoSubmitted ? "Quiz auto-submitted due to deadline" : "Quiz submitted successfully",
@@ -127,7 +131,9 @@ export async function POST(
                 totalQuestions: results.totalQuestions,
                 percentage: results.percentage,
                 autoSubmitted,
-                showResults: quiz.showResults,
+                showResults: gradingStatus === "pending" ? false : quiz.showResults,
+                hasDescriptive: results.hasDescriptive,
+                gradingStatus,
             },
         })
     } catch (error) {

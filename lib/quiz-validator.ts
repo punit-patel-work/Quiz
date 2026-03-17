@@ -2,18 +2,21 @@ import { z } from 'zod'
 
 export const QuestionSchema = z.object({
     id: z.number(),
-    type: z.enum(['multiple_choice', 'fill_in_the_blank', 'true_false']),
+    type: z.enum(['multiple_choice', 'fill_in_the_blank', 'true_false', 'descriptive']),
     topic: z.string(),
     question: z.string(),
     options: z.array(z.string()).optional(),
-    correct_answer: z.union([z.string(), z.boolean(), z.array(z.string())]),
-    explanation: z.string(),
+    correct_answer: z.union([z.string(), z.boolean(), z.array(z.string())]).optional(),
+    explanation: z.string().optional(),
+    max_score: z.number().optional(), // For descriptive questions: max points (defaults to 1)
+    model_answer: z.string().optional(), // Reference answer for teacher (not shown to students)
 })
 
 export const QuizSchema = z.array(QuestionSchema)
 
 export type Question = z.infer<typeof QuestionSchema>
 export type Quiz = z.infer<typeof QuizSchema>
+
 
 /**
  * Validate quiz JSON structure

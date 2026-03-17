@@ -1,0 +1,109 @@
+[
+    {
+        "id": 1,
+        "type": "multiple_choice",
+        "topic": "Biology",
+        "question": "Which organelle is responsible for producing energy in a cell?",
+        "options": [
+            "Nucleus",
+            "Mitochondria",
+            "Ribosome",
+            "Golgi Apparatus"
+        ],
+        "correct_answer": "Mitochondria",
+        "explanation": "Mitochondria are often called the 'powerhouse of the cell' because they generate most of the cell's ATP."
+    },
+    {
+        "id": 2,
+        "type": "true_false",
+        "topic": "Biology",
+        "question": "DNA stands for Deoxyribonucleic Acid.",
+        "correct_answer": true,
+        "explanation": "DNA (Deoxyribonucleic Acid) is the molecule that carries genetic instructions in all living organisms."
+    },
+    {
+        "id": 3,
+        "type": "fill_in_the_blank",
+        "topic": "Biology",
+        "question": "The process by which plants convert sunlight into food is called ____________.",
+        "correct_answer": [
+            "photosynthesis",
+            "Photosynthesis"
+        ],
+        "explanation": "Photosynthesis converts carbon dioxide and water into glucose and oxygen using sunlight."
+    },
+    {
+        "id": 4,
+        "type": "descriptive",
+        "topic": "Biology",
+        "question": "Explain the process of cellular respiration and how it differs from photosynthesis. Include the key inputs and outputs of each process.",
+        "max_score": 5,
+        "model_answer": "Cellular respiration is the process by which cells break down glucose (C6H12O6) in the presence of oxygen (O2) to produce ATP (energy), carbon dioxide (CO2), and water (H2O). It occurs in the mitochondria and involves three stages: glycolysis, the Krebs cycle, and the electron transport chain.\n\nPhotosynthesis is essentially the reverse — plants use sunlight energy to convert CO2 and H2O into glucose and O2. It occurs in the chloroplasts.\n\nKey difference: Respiration consumes glucose and oxygen to release energy, while photosynthesis uses light energy to build glucose from CO2 and water.",
+        "explanation": "This question assesses understanding of two fundamental biological processes and the ability to compare and contrast them."
+    },
+    {
+        "id": 5,
+        "type": "multiple_choice",
+        "topic": "Biology",
+        "question": "Which blood type is considered the universal donor?",
+        "options": [
+            "Type A",
+            "Type B",
+            "Type AB",
+            "Type O"
+        ],
+        "correct_answer": "Type O",
+        "explanation": "Type O negative blood can be given to patients of any blood type, making it the universal donor."
+    },
+    {
+        "id": 6,
+        "type": "descriptive",
+        "topic": "Biology",
+        "question": "Describe the structure of a DNA molecule and explain how its structure enables it to replicate.",
+        "max_score": 4,
+        "model_answer": "DNA has a double helix structure made of two strands of nucleotides. Each nucleotide consists of a sugar (deoxyribose), a phosphate group, and a nitrogenous base (A, T, G, or C). The two strands are held together by hydrogen bonds between complementary base pairs: Adenine pairs with Thymine (A-T), and Guanine pairs with Cytosine (G-C).\n\nDuring replication, the enzyme helicase unwinds and separates the two strands. DNA polymerase then reads each strand and synthesizes a new complementary strand using free nucleotides. Because each strand serves as a template, two identical copies of the original DNA molecule are produced. This is called semi-conservative replication.",
+        "explanation": "This question tests knowledge of DNA structure and the mechanism of DNA replication."
+    },
+    {
+        "id": 7,
+        "type": "true_false",
+        "topic": "Biology",
+        "question": "Red blood cells contain a nucleus.",
+        "correct_answer": false,
+        "explanation": "Mature red blood cells (erythrocytes) in mammals lack a nucleus, which allows more room for hemoglobin."
+    },
+    {
+        "id": 8,
+        "type": "fill_in_the_blank",
+        "topic": "Biology",
+        "question": "The basic unit of life is the ____________.",
+        "correct_answer": [
+            "cell",
+            "Cell"
+        ],
+        "explanation": "The cell is the smallest structural and functional unit of all living organisms."
+    },
+    {
+        "id": 9,
+        "type": "descriptive",
+        "topic": "Biology",
+        "question": "What is natural selection? Provide an example of how it can lead to the evolution of a species over time.",
+        "max_score": 3,
+        "model_answer": "Natural selection is the process by which organisms with traits better suited to their environment are more likely to survive and reproduce, passing those advantageous traits to the next generation. Over time, this leads to changes in the characteristics of a population.\n\nExample: The peppered moth in England. Before the Industrial Revolution, light-colored moths were camouflaged against pale tree bark and survived at higher rates. During industrialization, soot darkened the trees, and dark-colored moths became better camouflaged. Dark moths survived and reproduced more, increasing the proportion of dark-colored moths in the population.",
+        "explanation": "This question assesses understanding of natural selection and the ability to apply it to a real-world example."
+    },
+    {
+        "id": 10,
+        "type": "multiple_choice",
+        "topic": "Biology",
+        "question": "How many chromosomes do human cells typically contain?",
+        "options": [
+            "23",
+            "44",
+            "46",
+            "48"
+        ],
+        "correct_answer": "46",
+        "explanation": "Human body (somatic) cells contain 46 chromosomes arranged in 23 pairs."
+    }
+]

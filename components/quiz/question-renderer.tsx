@@ -63,6 +63,23 @@ export function QuestionRenderer({ question, answer, onAnswerChange }: QuestionR
               </p>
             </div>
           )}
+
+          {/* Textarea for Descriptive / Long Answer */}
+          {question.type === "descriptive" && (
+            <div className="space-y-4">
+              <textarea
+                value={(answer as string) || ""}
+                onChange={(e) => onAnswerChange(e.target.value)}
+                placeholder="Write your detailed answer here..."
+                rows={8}
+                className="w-full p-4 text-lg bg-background border-2 border-muted rounded-xl focus:border-primary focus:outline-none transition-colors resize-y min-h-[200px]"
+                autoFocus
+              />
+              <p className="text-sm text-muted-foreground">
+                This is a descriptive question. Your answer will be reviewed and graded by your teacher.
+              </p>
+            </div>
+          )}
         </motion.div>
       </AnimatePresence>
     </div>

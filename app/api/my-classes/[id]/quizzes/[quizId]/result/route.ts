@@ -52,11 +52,30 @@ export async function GET(
                 memberId: member.id,
                 status: "submitted",
             },
+            include: {
+                descriptiveGrades: true,
+            },
             orderBy: { submittedAt: "desc" },
         })
 
         if (!attempt) {
             return NextResponse.json({ error: "No result found" }, { status: 404 })
+        }
+
+        // If descriptive questions are pending grading, gate the results
+        if (attempt.gradingStatus === "pending") {
+            return NextResponse.json({
+                quizName: quiz.name,
+                score: null,
+                totalQuestions: attempt.totalQuestions,
+                percentage: null,
+                submittedAt: attempt.submittedAt,
+                autoSubmitted: attempt.autoSubmitted,
+                showResults: false,
+                gradingStatus: "pending",
+                details: null,
+                message: "Your quiz is being reviewed by your teacher. Results will be available once all descriptive answers have been graded.",
+            })
         }
 
         // Build detailed breakdown if showResults is enabled
@@ -74,9 +93,10 @@ export async function GET(
             detailedResults = questions.map((q, index) => {
                 // Use q.id (the question's actual id) to lookup the answer
                 const userAnswer = answerMap.get(q.id)
+                const isDescriptive = q.type === 'descriptive'
 
                 // Use share scoring logic
-                const isCorrect = checkAnswer(q, userAnswer)
+                const isCorrect = isDescriptive ? null : checkAnswer(q, userAnswer)
 
                 let correctAnswer: any = null
 
@@ -89,6 +109,21 @@ export async function GET(
                     correctAnswer = correctAnswers[0]
                 }
 
+                // For descriptive questions, include grade info if graded
+                let descriptiveGrade = null
+                if (isDescriptive && attempt.gradingStatus === "graded") {
+                    const grade = (attempt as any).descriptiveGrades?.find(
+                        (g: any) => g.questionId === q.id
+                    )
+                    if (grade) {
+                        descriptiveGrade = {
+                            score: grade.score,
+                            maxScore: grade.maxScore,
+                            feedback: grade.feedback,
+                        }
+                    }
+                }
+
                 return {
                     questionIndex: index,
                     questionText: q.question,
@@ -98,6 +133,8 @@ export async function GET(
                     correctAnswer,
                     explanation: q.explanation || null,
                     isCorrect,
+                    isDescriptive,
+                    descriptiveGrade,
                     points: q.points || 1,
                 }
             })
@@ -111,6 +148,7 @@ export async function GET(
             submittedAt: attempt.submittedAt,
             autoSubmitted: attempt.autoSubmitted,
             showResults: quiz.showResults,
+            gradingStatus: attempt.gradingStatus,
             details: detailedResults,
         })
     } catch (error) {

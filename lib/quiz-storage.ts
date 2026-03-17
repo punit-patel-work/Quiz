@@ -30,18 +30,21 @@ export function reconstructResults(
 
     return questions.map((question) => {
         const userAnswer = answersMap.get(question.id) ?? null
-        const isCorrect = checkAnswer(question, userAnswer)
+        const isDescriptive = question.type === 'descriptive'
+        const isCorrect = isDescriptive ? false : checkAnswer(question, userAnswer)
 
         return {
             questionId: question.id,
             userAnswer,
             correctAnswer: question.correct_answer,
             isCorrect,
+            isDescriptive,
             question: question.question,
             explanation: question.explanation,
             type: question.type,
             topic: question.topic,
             options: question.options,
+            maxScore: question.max_score,
         }
     })
 }

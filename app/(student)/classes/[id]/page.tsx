@@ -45,6 +45,7 @@ import {
   XCircle,
   Eye
 } from "lucide-react"
+import { FileText } from "lucide-react"
 import { format } from "date-fns"
 
 export default function ClassDashboardPage() {
@@ -593,6 +594,14 @@ function QuizCard({ quiz, classId, onDelete }: { quiz: any; classId: string; onD
               Results
             </Link>
           </Button>
+          {(quiz.questions as any[]).some((q: any) => q.type === "descriptive") && (
+            <Button variant="outline" size="sm" asChild className="border-amber-300 text-amber-700 hover:bg-amber-50 dark:border-amber-700 dark:text-amber-400 dark:hover:bg-amber-950/30">
+              <Link href={`/classes/${classId}/quizzes/${quiz.id}/grade`}>
+                <FileText className="mr-1 h-3 w-3" />
+                Grade
+              </Link>
+            </Button>
+          )}
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="ghost" size="sm" disabled={isDeleting}>

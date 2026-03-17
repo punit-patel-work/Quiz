@@ -12,10 +12,12 @@ import { Plus, Trash2, Check, X } from "lucide-react"
 
 interface Question {
   id: string
-  type: "multiple-choice" | "true-false" | "fill-in-blank"
+  type: "multiple-choice" | "true-false" | "fill-in-blank" | "descriptive"
   question: string
   options?: string[]
   correctAnswer: string | boolean
+  max_score?: number
+  model_answer?: string
 }
 
 interface QuestionEditorProps {
@@ -26,7 +28,7 @@ interface QuestionEditorProps {
 }
 
 export function QuestionEditor({ question, index, onChange, onRemove }: QuestionEditorProps) {
-  const handleTypeChange = (type: "multiple-choice" | "true-false" | "fill-in-blank") => {
+  const handleTypeChange = (type: "multiple-choice" | "true-false" | "fill-in-blank" | "descriptive") => {
     let newQuestion = { ...question, type }
     
     // Reset options/answer based on type
@@ -36,6 +38,11 @@ export function QuestionEditor({ question, index, onChange, onRemove }: Question
     } else if (type === "fill-in-blank") {
       newQuestion.options = []
       newQuestion.correctAnswer = ""
+    } else if (type === "descriptive") {
+      newQuestion.options = []
+      newQuestion.correctAnswer = ""
+      newQuestion.max_score = 1
+      newQuestion.model_answer = ""
     } else {
       newQuestion.options = ["", "", "", ""]
       newQuestion.correctAnswer = ""
@@ -96,6 +103,7 @@ export function QuestionEditor({ question, index, onChange, onRemove }: Question
                     <SelectItem value="multiple-choice">Multiple Choice</SelectItem>
                     <SelectItem value="true-false">True / False</SelectItem>
                     <SelectItem value="fill-in-blank">Fill in Blank</SelectItem>
+                    <SelectItem value="descriptive">Descriptive</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -161,6 +169,33 @@ export function QuestionEditor({ question, index, onChange, onRemove }: Question
                      placeholder="Type the exact answer..."
                    />
                    <p className="text-xs text-muted-foreground">The student's answer must match this exactly (case insensitive).</p>
+                 </div>
+               )}
+
+               {question.type === "descriptive" && (
+                 <div className="space-y-4">
+                   <div className="space-y-2">
+                     <Label className="text-xs text-muted-foreground">Max Score (points)</Label>
+                     <Input 
+                       type="number"
+                       min={1}
+                       max={100}
+                       value={question.max_score || 1}
+                       onChange={(e) => onChange({ ...question, max_score: parseInt(e.target.value) || 1 })}
+                       placeholder="1"
+                     />
+                     <p className="text-xs text-muted-foreground">Maximum points a teacher can award for this question.</p>
+                   </div>
+                   <div className="space-y-2">
+                     <Label className="text-xs text-muted-foreground">Model Answer (optional — for teacher reference only)</Label>
+                     <Textarea
+                       value={question.model_answer || ""}
+                       onChange={(e) => onChange({ ...question, model_answer: e.target.value })}
+                       placeholder="Write an ideal answer for teacher reference..."
+                       rows={3}
+                     />
+                     <p className="text-xs text-muted-foreground">This is only visible to the teacher during grading, not to students.</p>
+                   </div>
                  </div>
                )}
             </div>

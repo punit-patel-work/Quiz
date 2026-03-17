@@ -35,6 +35,7 @@ model User {
   retakesGranted     QuizRetake[]       @relation("RetakeGrantedBy")
   correctionsApplied QuestionCorrection[] @relation("CorrectionAppliedBy")
   notifications      Notification[]
+  descriptiveGrades  DescriptiveGrade[]  @relation("GradedBy")
 
   @@map("users")
 }
@@ -197,12 +198,14 @@ model ClassQuizAttempt {
   submittedAt     DateTime?
   autoSubmitted   Boolean  @default(false)
   status          String   @default("in_progress") // "in_progress", "submitted"
+  gradingStatus   String   @default("none") // "none", "pending", "graded"
   isRetake        Boolean  @default(false)
   retakeId        String?  // Reference to QuizRetake if this is a retake
 
   classQuiz          ClassQuiz           @relation(fields: [classQuizId], references: [id], onDelete: Cascade)
   member             ClassMember         @relation(fields: [memberId], references: [id], onDelete: Cascade)
   scoreModifications ScoreModification[]
+  descriptiveGrades  DescriptiveGrade[]
 
   @@index([classQuizId])
   @@index([memberId])
@@ -286,6 +289,24 @@ model ScoreModification {
 
   @@index([attemptId])
   @@map("score_modifications")
+}
+
+model DescriptiveGrade {
+  id            String   @id @default(cuid())
+  attemptId     String
+  questionId    Int      // ID of the descriptive question in the quiz JSON
+  score         Int      // Points awarded by teacher (0 to maxScore)
+  maxScore      Int      @default(1)
+  feedback      String?  // Optional teacher feedback
+  gradedById    String
+  gradedAt      DateTime @default(now())
+
+  attempt  ClassQuizAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  gradedBy User             @relation("GradedBy", fields: [gradedById], references: [id])
+
+  @@unique([attemptId, questionId])
+  @@index([attemptId])
+  @@map("descriptive_grades")
 }
 
 // ==========================================

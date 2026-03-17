@@ -123,14 +123,22 @@ export default function ClassQuizPage() {
 
       const data = await res.json()
       if (res.ok) {
-        toast({ 
-          title: autoSubmit ? "Time's Up!" : "Quiz Submitted", 
-          description: "Your answers have been recorded." 
-        })
-        if (data.result.showResults) {
-          router.push(`/my-classes/${classId}/quiz/${quizId}/result?score=${data.result.score}&total=${data.result.totalQuestions}&percentage=${data.result.percentage}`)
-        } else {
+        if (data.result.hasDescriptive) {
+          toast({ 
+            title: autoSubmit ? "Time's Up!" : "Quiz Submitted", 
+            description: "Your answers have been recorded. Results will be available after your teacher reviews the descriptive answers." 
+          })
           router.push(`/my-classes/${classId}`)
+        } else {
+          toast({ 
+            title: autoSubmit ? "Time's Up!" : "Quiz Submitted", 
+            description: "Your answers have been recorded." 
+          })
+          if (data.result.showResults) {
+            router.push(`/my-classes/${classId}/quiz/${quizId}/result?score=${data.result.score}&total=${data.result.totalQuestions}&percentage=${data.result.percentage}`)
+          } else {
+            router.push(`/my-classes/${classId}`)
+          }
         }
       } else {
         toast({ variant: "destructive", title: "Submission Error", description: data.error })

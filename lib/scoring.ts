@@ -4,12 +4,18 @@ export interface UserAnswer {
     questionId: number
     userAnswer: string | boolean | null
     isCorrect: boolean
+    isDescriptive?: boolean
 }
 
 /**
- * Check if an answer is correct
+ * Check if an answer is correct (returns false for descriptive questions — they need manual grading)
  */
 export function checkAnswer(question: Question, userAnswer: string | boolean | null): boolean {
+    // Descriptive questions cannot be auto-graded
+    if (question.type === 'descriptive') {
+        return false
+    }
+
     if (userAnswer === null || userAnswer === undefined) {
         return false
     }
@@ -38,7 +44,7 @@ export function checkAnswer(question: Question, userAnswer: string | boolean | n
 }
 
 /**
- * Calculate quiz score
+ * Calculate quiz score (auto-gradable questions only; descriptive questions are scored separately by teacher)
  */
 export function calculateScore(
     questions: Question[],
@@ -48,33 +54,55 @@ export function calculateScore(
     totalQuestions: number
     percentage: number
     results: UserAnswer[]
+    autoGradedScore: number
+    autoGradableCount: number
+    descriptiveCount: number
+    hasDescriptive: boolean
 } {
     const results: UserAnswer[] = []
-    let score = 0
+    let autoGradedScore = 0
+    let descriptiveCount = 0
 
     questions.forEach((question) => {
         const userAnswer = userAnswers.get(question.id) ?? null
-        const isCorrect = checkAnswer(question, userAnswer)
+        const isDescriptive = question.type === 'descriptive'
 
-        if (isCorrect) {
-            score++
+        if (isDescriptive) {
+            descriptiveCount++
+            results.push({
+                questionId: question.id,
+                userAnswer,
+                isCorrect: false,
+                isDescriptive: true,
+            })
+        } else {
+            const isCorrect = checkAnswer(question, userAnswer)
+            if (isCorrect) {
+                autoGradedScore++
+            }
+            results.push({
+                questionId: question.id,
+                userAnswer,
+                isCorrect,
+                isDescriptive: false,
+            })
         }
-
-        results.push({
-            questionId: question.id,
-            userAnswer,
-            isCorrect,
-        })
     })
 
     const totalQuestions = questions.length
-    const percentage = totalQuestions > 0 ? (score / totalQuestions) * 100 : 0
+    const autoGradableCount = totalQuestions - descriptiveCount
+    // Percentage is based on auto-gradable questions only (will be recalculated after teacher grading)
+    const percentage = autoGradableCount > 0 ? (autoGradedScore / autoGradableCount) * 100 : 0
 
     return {
-        score,
+        score: autoGradedScore, // Only auto-graded score for now
         totalQuestions,
-        percentage: Math.round(percentage * 100) / 100, // Round to 2 decimal places
+        percentage: Math.round(percentage * 100) / 100,
         results,
+        autoGradedScore,
+        autoGradableCount,
+        descriptiveCount,
+        hasDescriptive: descriptiveCount > 0,
     }
 }
 

@@ -219,7 +219,8 @@ export default function CreateClassQuizPage() {
                     <QuizBuilder questions={questions} setQuestions={setQuestions} />
                   </TabsContent>
 
-                  <TabsContent value="upload">
+                    <TabsContent value="upload">
+                    <div className="space-y-4">
                     <div className="border-2 border-dashed rounded-lg p-10 text-center hover:bg-muted/5 transition-colors">
                       <input
                         type="file"
@@ -243,6 +244,19 @@ export default function CreateClassQuizPage() {
                           </div>
                         )}
                       </label>
+                    </div>
+                    <div className="flex items-center justify-between bg-muted/50 rounded-lg p-3">
+                      <div>
+                        <p className="text-sm font-medium">Need a template?</p>
+                        <p className="text-xs text-muted-foreground">Includes MCQ, True/False, Fill-in-the-Blank, and Descriptive question examples.</p>
+                      </div>
+                      <Button variant="outline" size="sm" asChild className="flex-shrink-0">
+                        <a href="/Class_Quiz_Template.json" download="Class_Quiz_Template.json">
+                          <Upload className="mr-1.5 h-3 w-3" />
+                          Download Template
+                        </a>
+                      </Button>
+                    </div>
                     </div>
                   </TabsContent>
                 </Tabs>
