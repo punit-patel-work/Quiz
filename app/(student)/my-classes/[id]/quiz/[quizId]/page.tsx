@@ -178,7 +178,8 @@ export default function ClassQuizPage() {
   const currentQuestion = quizData.questions[currentQuestionIndex]
   const currentAnswer = userAnswers.get(currentQuestion?.id)
   const progress = ((currentQuestionIndex + 1) / quizData.questions.length) * 100
-  const isLowTime = timeRemaining < 60
+  const isRedTime = timeRemaining <= 60 && timeRemaining > 0
+  const isAmberTime = timeRemaining <= 300 && timeRemaining > 60
 
   return (
     <div className={`min-h-screen transition-colors duration-500 ${zenMode ? 'bg-background fixed inset-0 z-50 overflow-y-auto' : 'bg-muted/30'}`}>
@@ -195,8 +196,10 @@ export default function ClassQuizPage() {
           </div>
 
           <div className="flex items-center gap-4">
-            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-md font-mono font-medium ${
-              isLowTime ? "bg-red-100 text-red-600 animate-pulse" : "bg-muted"
+            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-md font-mono font-medium transition-colors ${
+              isRedTime ? "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 animate-pulse" : 
+              isAmberTime ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" : 
+              "bg-muted"
             }`}>
               <Clock className="h-4 w-4" />
               {formatTime(timeRemaining)}

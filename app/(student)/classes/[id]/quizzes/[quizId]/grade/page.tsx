@@ -57,6 +57,7 @@ export default function GradeQuizPage() {
   const [expandedAttempt, setExpandedAttempt] = useState<string | null>(null)
   const [grades, setGrades] = useState<Map<string, Map<number, { score: number; feedback: string }>>>(new Map())
   const [savingAttempt, setSavingAttempt] = useState<string | null>(null)
+  const [lastSavedAttempt, setLastSavedAttempt] = useState<string | null>(null)
 
   const params = useParams()
   const router = useRouter()
@@ -158,6 +159,8 @@ export default function GradeQuizPage() {
           title: result.allGraded ? "All Questions Graded!" : "Grades Saved",
           description: result.message,
         })
+        setLastSavedAttempt(attemptId)
+        setTimeout(() => setLastSavedAttempt(null), 3000)
         // Refresh data
         fetchGradingData()
       } else {
@@ -374,7 +377,12 @@ export default function GradeQuizPage() {
                       })}
 
                       {/* Save Button */}
-                      <div className="flex justify-end">
+                      <div className="flex items-center justify-end gap-3">
+                        {lastSavedAttempt === attempt.attemptId && (
+                           <span className="text-sm text-green-600 dark:text-green-400 flex items-center gap-1 font-medium transition-opacity animate-in fade-in duration-300">
+                             <CheckCircle className="h-4 w-4" /> Saved just now
+                           </span>
+                        )}
                         <Button
                           onClick={() => handleSaveGrades(attempt.attemptId)}
                           disabled={savingAttempt === attempt.attemptId}

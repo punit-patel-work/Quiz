@@ -9,9 +9,17 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/components/ui/use-toast"
-import { ArrowLeft, Loader2, Upload, FileJson, Layers, Edit } from "lucide-react"
+import { ArrowLeft, Loader2, Upload, FileJson, Layers, Edit, CheckCircle } from "lucide-react"
 import { validateQuizJSON } from "@/lib/quiz-validator"
 import { QuizBuilder } from "@/components/quiz/quiz-builder"
 
@@ -29,6 +37,11 @@ export default function CreateClassQuizPage() {
   const [fileName, setFileName] = useState("")
   const [creationMethod, setCreationMethod] = useState("manual")
   
+  // JSON Preview Modal State
+  const [previewData, setPreviewData] = useState<any[] | null>(null)
+  const [previewFileName, setPreviewFileName] = useState("")
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false)
+
   const params = useParams()
   const router = useRouter()
   const { toast } = useToast()
@@ -48,31 +61,50 @@ export default function CreateClassQuizPage() {
         toast({
           variant: "destructive",
           title: "Invalid Quiz Format",
-          description: "Please check your JSON format",
+          description: "Please check your JSON format consistency.",
         })
+        e.target.value = "" // reset input
         return
       }
 
-      setQuestions(validation.data || [])
-      setFileName(file.name)
+      setPreviewData(validation.data || [])
+      setPreviewFileName(file.name)
+      setIsPreviewOpen(true)
+      e.target.value = "" // reset input
       
-      // Auto-set name from file if not set
-      if (!name) {
-        const baseName = file.name.replace(/\.json$/i, "")
-        setName(baseName)
-      }
-
-      toast({
-        title: "Quiz Loaded",
-        description: `${validation.data?.length} questions loaded from file`,
-      })
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
         description: "Failed to parse JSON file",
       })
+      e.target.value = "" // reset input
     }
+  }
+
+  const confirmUpload = () => {
+    if (previewData) {
+      setQuestions(previewData)
+      setFileName(previewFileName)
+      
+      // Auto-set name from file if not set
+      if (!name) {
+        const baseName = previewFileName.replace(/\.json$/i, "")
+        setName(baseName)
+      }
+
+      toast({
+        title: "Quiz Loaded",
+        description: `${previewData.length} questions loaded from file`,
+      })
+    }
+    setIsPreviewOpen(false)
+  }
+
+  const getQuestionCountDetails = (qs: any[]) => {
+    const counts: Record<string, number> = {}
+    qs.forEach(q => counts[q.type] = (counts[q.type] || 0) + 1)
+    return counts
   }
 
   const handleCreate = async () => {
@@ -150,6 +182,49 @@ export default function CreateClassQuizPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
+      {/* JSON Preview Modal */}
+      <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Import Quiz File</DialogTitle>
+            <DialogDescription>
+              We found {previewData?.length} questions in <strong>{previewFileName}</strong>.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {previewData && (() => {
+                const typeMap: Record<string, string> = {
+                  multiple_choice: "Multiple Choice",
+                  true_false: "True / False",
+                  fill_blank: "Fill in Blank",
+                  descriptive: "Descriptive (Manual)"
+                }
+                const counts = getQuestionCountDetails(previewData)
+                return Object.entries(counts).map(([type, count]) => (
+                  <div key={type} className="bg-muted p-3 rounded-lg text-center">
+                    <div className="text-2xl font-bold text-primary">{count}</div>
+                    <div className="text-xs text-muted-foreground">{typeMap[type] || type}</div>
+                  </div>
+                ))
+              })()}
+            </div>
+            {previewData?.some(q => q.type === 'descriptive') && (
+              <div className="bg-amber-50 text-amber-900 border border-amber-200 dark:bg-amber-900/20 dark:border-amber-800 dark:text-amber-400 p-3 rounded-lg text-sm flex items-start gap-2">
+                <Layers className="h-4 w-4 mt-0.5 shrink-0" />
+                This quiz contains descriptive questions that will require manual grading.
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsPreviewOpen(false)}>Cancel</Button>
+            <Button onClick={confirmUpload}>
+              <CheckCircle className="mr-2 h-4 w-4" /> Looks Good, Import
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">

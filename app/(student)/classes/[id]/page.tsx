@@ -6,6 +6,7 @@ import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -30,11 +31,11 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { useToast } from "@/components/ui/use-toast"
-import { 
-  ArrowLeft, 
-  Users, 
-  BookOpen, 
-  Settings, 
+import {
+  ArrowLeft,
+  Users,
+  BookOpen,
+  Settings,
   UserPlus,
   Trash2,
   Loader2,
@@ -43,7 +44,11 @@ import {
   Copy,
   CheckCircle,
   XCircle,
-  Eye
+  Eye,
+  Plus,
+  Play,
+  MoreVertical,
+  Calendar
 } from "lucide-react"
 import { FileText } from "lucide-react"
 import { format } from "date-fns"
@@ -228,14 +233,46 @@ export default function ClassDashboardPage() {
   const copyClassCode = () => {
     navigator.clipboard.writeText(classData?.code || "")
     setCopied(true)
+    toast({
+      title: "Copied!",
+      description: "Class code copied to clipboard",
+      className: "bg-green-50 text-green-900 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800",
+    })
     setTimeout(() => setCopied(false), 2000)
   }
 
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-12">
-        <div className="flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <div className="max-w-6xl mx-auto space-y-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-10 w-10 rounded-md" />
+              <div className="space-y-2">
+                <Skeleton className="h-10 w-48" />
+                <Skeleton className="h-4 w-32" />
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Skeleton className="h-10 w-40" />
+              <Skeleton className="h-10 w-10" />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map(i => (
+              <Card key={i}>
+                <CardContent className="p-4 text-center flex flex-col items-center justify-center space-y-2">
+                  <Skeleton className="h-10 w-12" />
+                  <Skeleton className="h-4 w-20" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          <div className="space-y-6">
+            <Skeleton className="h-10 w-72" />
+            <Skeleton className="h-32 w-full" />
+            <Skeleton className="h-32 w-full" />
+          </div>
         </div>
       </div>
     )
@@ -592,6 +629,12 @@ function QuizCard({ quiz, classId, onDelete }: { quiz: any; classId: string; onD
             <Link href={`/classes/${classId}/quizzes/${quiz.id}/results`}>
               <Eye className="mr-1 h-3 w-3" />
               Results
+            </Link>
+          </Button>
+          <Button variant="secondary" size="sm" asChild>
+            <Link href={`/classes/${classId}/quizzes/${quiz.id}/preview`}>
+              <Play className="mr-1 h-3 w-3" />
+              Preview
             </Link>
           </Button>
           {(quiz.questions as any[]).some((q: any) => q.type === "descriptive") && (
