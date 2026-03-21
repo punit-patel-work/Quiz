@@ -36,6 +36,7 @@ model User {
   correctionsApplied QuestionCorrection[] @relation("CorrectionAppliedBy")
   notifications      Notification[]
   descriptiveGrades  DescriptiveGrade[]  @relation("GradedBy")
+  classActivityLogs  ClassActivityLog[]
 
   @@map("users")
 }
@@ -125,15 +126,19 @@ model Class {
   name           String
   description    String?
   code           String   @unique
-  teacherId      String
-  maxRetakes     Int      @default(5) // Overall retakes allowed for all students
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  teacherId            String
+  maxRetakes           Int      @default(5) // Overall retakes allowed for all students
+  allowTaCreateEditQuizzes Boolean @default(false)
+  allowTaGradeScores       Boolean @default(false)
+  allowTaGrantRetakes      Boolean @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 
   teacher     User            @relation("TeacherClasses", fields: [teacherId], references: [id], onDelete: Cascade)
   members     ClassMember[]
   quizzes     ClassQuiz[]
   invitations ClassInvitation[]
+  activityLogs ClassActivityLog[]
 
   @@index([teacherId])
   @@index([code])
@@ -382,4 +387,29 @@ model PasswordResetToken {
   @@index([email])
   @@index([token])
   @@map("password_reset_tokens")
+}
+
+// ==========================================
+// CLASS ACTIVITY LOGS (TA FEATURE)
+// ==========================================
+
+model ClassActivityLog {
+  id          String   @id @default(cuid())
+  classId     String
+  actorId     String
+  actorRole   String   // "teacher", "assistant", "admin"
+  action      String   // "create_quiz", "update_quiz", "update_score", "grant_retake", "apply_correction", "make_ta", "remove_ta", etc.
+  targetType  String   // "quiz", "attempt", "question", "member", "class"
+  targetId    String
+  details     Json?    
+  createdAt   DateTime @default(now())
+
+  class       Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  actor       User     @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@index([classId])
+  @@index([actorId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("class_activity_logs")
 }

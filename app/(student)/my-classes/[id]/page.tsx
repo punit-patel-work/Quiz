@@ -14,7 +14,8 @@ import {
   CheckCircle,
   AlertCircle,
   Loader2,
-  Users
+  Users,
+  ShieldCheck
 } from "lucide-react"
 import { format, formatDistanceToNow } from "date-fns"
 
@@ -94,18 +95,29 @@ export default function StudentClassPage() {
     <div className="container mx-auto px-4 py-12">
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/my-classes">
-              <ArrowLeft className="h-5 w-5" />
-            </Link>
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">{classData.name}</h1>
-            <p className="text-muted-foreground">
-              Teacher: {classData.teacher.name || classData.teacher.email}
-            </p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" asChild>
+              <Link href="/my-classes">
+                <ArrowLeft className="h-5 w-5" />
+              </Link>
+            </Button>
+            <div>
+              <h1 className="text-3xl font-bold">{classData.name}</h1>
+              <p className="text-muted-foreground">
+                Teacher: {classData.teacher.name || classData.teacher.email}
+              </p>
+            </div>
           </div>
+
+          {classData.memberRole === "assistant" && (
+            <Button asChild variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800 dark:hover:bg-blue-900/50">
+              <Link href={`/classes/${classId}`}>
+                <ShieldCheck className="mr-2 h-4 w-4" />
+                TA Management Portal
+              </Link>
+            </Button>
+          )}
         </div>
 
         {/* Stats */}

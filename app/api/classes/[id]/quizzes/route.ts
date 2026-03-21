@@ -2,6 +2,8 @@ import { NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { createClassNotification } from "@/lib/notifications"
+import { authorizeQuizEdit } from "@/lib/class-permissions"
+import { logClassActivity } from "@/lib/class-activity"
 
 // GET /api/classes/[id]/quizzes - List class quizzes
 export async function GET(request: Request, props: { params: Promise<{ id: string }> }) {
@@ -156,9 +158,9 @@ export async function POST(request: Request, props: { params: Promise<{ id: stri
             )
         }
 
-        // Verify teacher
         const classData = await prisma.class.findUnique({
             where: { id: params.id },
+            select: { id: true, name: true }
         })
 
         if (!classData) {
@@ -168,9 +170,10 @@ export async function POST(request: Request, props: { params: Promise<{ id: stri
             )
         }
 
-        if (classData.teacherId !== session.user.id) {
+        const canCreate = await authorizeQuizEdit(params.id, session.user.id)
+        if (!canCreate) {
             return NextResponse.json(
-                { error: "Only the teacher can create quizzes" },
+                { error: "Access denied. Only the teacher or permitted TAs can create quizzes" },
                 { status: 403 }
             )
         }
@@ -240,6 +243,15 @@ export async function POST(request: Request, props: { params: Promise<{ id: stri
             type: "INFO",
             link: `/my-classes/${params.id}/quiz/${quiz.id}`,
             excludeUserId: session.user.id,
+        })
+
+        await logClassActivity({
+            classId: params.id,
+            actorId: session.user.id,
+            action: "create_quiz",
+            targetType: "quiz",
+            targetId: quiz.id,
+            details: { name: quiz.name }
         })
 
         return NextResponse.json(quiz, { status: 201 })

@@ -109,7 +109,13 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
         }
 
         const body = await request.json()
-        const { name, description } = body
+        const { 
+            name, 
+            description,
+            allowTaCreateEditQuizzes,
+            allowTaGradeScores,
+            allowTaGrantRetakes
+        } = body
 
         if (!name || name.trim().length === 0) {
             return NextResponse.json(
@@ -123,6 +129,9 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
             data: {
                 name: name.trim(),
                 description: description?.trim() || null,
+                allowTaCreateEditQuizzes: allowTaCreateEditQuizzes ?? classData.allowTaCreateEditQuizzes,
+                allowTaGradeScores: allowTaGradeScores ?? classData.allowTaGradeScores,
+                allowTaGrantRetakes: allowTaGrantRetakes ?? classData.allowTaGrantRetakes,
             },
         })
 

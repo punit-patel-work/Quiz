@@ -2,6 +2,8 @@ import { NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { createNotification } from "@/lib/notifications"
+import { authorizeGrading } from "@/lib/class-permissions"
+import { logClassActivity } from "@/lib/class-activity"
 
 // GET /api/classes/[id]/quizzes/[quizId]/grade - Get all attempts with descriptive answers for grading
 export async function GET(
@@ -16,14 +18,16 @@ export async function GET(
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
         }
 
-        // Verify teacher
+        // Verify authorizations
         const classData = await prisma.class.findUnique({
             where: { id: params.id },
+            select: { id: true, name: true, teacherId: true }
         })
 
-        if (!classData || classData.teacherId !== session.user.id) {
+        const canGrade = await authorizeGrading(params.id, session.user.id)
+        if (!classData || !canGrade) {
             return NextResponse.json(
-                { error: "Only the teacher can grade quizzes" },
+                { error: "Access denied. Only the teacher or permitted TAs can grade quizzes." },
                 { status: 403 }
             )
         }
@@ -120,6 +124,8 @@ export async function GET(
 
         return NextResponse.json({
             quiz: { id: quiz.id, name: quiz.name },
+            isTeacher: classData.teacherId === session.user.id,
+            isTA: classData.teacherId !== session.user.id,
             descriptiveQuestions: descriptiveQuestions.map((q: any) => ({
                 id: q.id,
                 question: q.question,
@@ -152,14 +158,16 @@ export async function POST(
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
         }
 
-        // Verify teacher
+        // Verify authorizations
         const classData = await prisma.class.findUnique({
             where: { id: params.id },
+            select: { id: true, name: true, teacherId: true }
         })
 
-        if (!classData || classData.teacherId !== session.user.id) {
+        const canGrade = await authorizeGrading(params.id, session.user.id)
+        if (!classData || !canGrade) {
             return NextResponse.json(
-                { error: "Only the teacher can grade quizzes" },
+                { error: "Access denied. Only the teacher or permitted TAs can grade quizzes." },
                 { status: 403 }
             )
         }
@@ -267,6 +275,17 @@ export async function POST(
                 console.error("Failed to send grading notification:", e)
             }
         }
+
+        // Removed rogue bracket
+
+        await logClassActivity({
+            classId: params.id,
+            actorId: session.user.id,
+            action: "update_score",
+            targetType: "attempt",
+            targetId: attemptId,
+            details: { quizId: params.quizId, studentId: attempt.member.user.id, questionsGraded: grades.length }
+        })
 
         return NextResponse.json({
             message: allGraded

@@ -186,7 +186,14 @@ export default function EditClassQuizPage() {
             </Link>
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">Edit Quiz</h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-3xl font-bold">Edit Quiz</h1>
+              {quiz?.isTA && (
+                <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-md font-medium border border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800">
+                  TA Mode
+                </span>
+              )}
+            </div>
             <p className="text-muted-foreground">
               Modify quiz settings and questions
             </p>

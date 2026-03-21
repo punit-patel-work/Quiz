@@ -21,7 +21,12 @@ export async function GET() {
         }
 
         const classes = await prisma.class.findMany({
-            where: { teacherId: session.user.id },
+            where: {
+                OR: [
+                    { teacherId: session.user.id },
+                    { members: { some: { userId: session.user.id, role: "assistant" } } }
+                ]
+            },
             include: {
                 _count: {
                     select: {
@@ -33,7 +38,12 @@ export async function GET() {
             orderBy: { createdAt: "desc" },
         })
 
-        return NextResponse.json(classes)
+        const formattedClasses = classes.map(c => ({
+            ...c,
+            userRole: c.teacherId === session.user.id ? "teacher" : "assistant"
+        }))
+
+        return NextResponse.json(formattedClasses)
     } catch (error) {
         console.error("Classes fetch error:", error)
         return NextResponse.json(

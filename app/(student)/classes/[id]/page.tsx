@@ -4,11 +4,13 @@ import { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
 import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Dialog,
@@ -48,7 +50,10 @@ import {
   Plus,
   Play,
   MoreVertical,
-  Calendar
+  Calendar,
+  ShieldAlert,
+  ShieldCheck,
+  Activity
 } from "lucide-react"
 import { FileText } from "lucide-react"
 import { format } from "date-fns"
@@ -58,11 +63,20 @@ export default function ClassDashboardPage() {
   const [members, setMembers] = useState<any[]>([])
   const [quizzes, setQuizzes] = useState<any[]>([])
   const [invitations, setInvitations] = useState<any[]>([])
+  const [activities, setActivities] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false)
   const [emailsToInvite, setEmailsToInvite] = useState("")
   const [isInviting, setIsInviting] = useState(false)
   const [copied, setCopied] = useState(false)
+
+  const [editName, setEditName] = useState("")
+  const [editDescription, setEditDescription] = useState("")
+  const [taCreateQuizzes, setTaCreateQuizzes] = useState(false)
+  const [taGradeScores, setTaGradeScores] = useState(false)
+  const [taGrantRetakes, setTaGrantRetakes] = useState(false)
+  const [isSavingSettings, setIsSavingSettings] = useState(false)
+
   const params = useParams()
   const router = useRouter()
   const { toast } = useToast()
@@ -74,6 +88,7 @@ export default function ClassDashboardPage() {
     fetchMembers()
     fetchQuizzes()
     fetchInvitations()
+    fetchActivities()
   }, [classId])
 
   const fetchClassData = async () => {
@@ -81,11 +96,16 @@ export default function ClassDashboardPage() {
       const res = await fetch(`/api/classes/${classId}`)
       if (res.ok) {
         const data = await res.json()
-        if (!data.isTeacher) {
+        if (!data.isTeacher && data.memberRole !== "assistant") {
           router.push("/my-classes")
           return
         }
         setClassData(data)
+        setEditName(data.name || "")
+        setEditDescription(data.description || "")
+        setTaCreateQuizzes(data.allowTaCreateEditQuizzes || false)
+        setTaGradeScores(data.allowTaGradeScores || false)
+        setTaGrantRetakes(data.allowTaGrantRetakes || false)
       } else {
         router.push("/classes")
       }
@@ -129,6 +149,18 @@ export default function ClassDashboardPage() {
       }
     } catch (error) {
       console.error("Failed to fetch invitations:", error)
+    }
+  }
+
+  const fetchActivities = async () => {
+    try {
+      const res = await fetch(`/api/classes/${classId}/activity`)
+      if (res.ok) {
+        const data = await res.json()
+        setActivities(data)
+      }
+    } catch (error) {
+      console.error("Failed to fetch activities:", error)
     }
   }
 
@@ -208,6 +240,29 @@ export default function ClassDashboardPage() {
     }
   }
 
+  const handleUpdateRole = async (memberId: string, role: string) => {
+    try {
+      const res = await fetch(`/api/classes/${classId}/members/${memberId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role }),
+      })
+
+      if (res.ok) {
+        toast({
+          title: role === "assistant" ? "Promoted to TA" : "TA Role Removed",
+          description: role === "assistant" ? "Student is now a Teaching Assistant." : "Student is now a regular student.",
+          className: role === "assistant" ? "bg-blue-50 text-blue-900 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800" : "",
+        })
+        fetchMembers()
+      } else {
+        toast({ variant: "destructive", title: "Error updating role" })
+      }
+    } catch (error) {
+      toast({ variant: "destructive", title: "Failed to update role" })
+    }
+  }
+
   const handleDeleteClass = async () => {
     try {
       const res = await fetch(`/api/classes/${classId}`, {
@@ -227,6 +282,34 @@ export default function ClassDashboardPage() {
         title: "Error",
         description: "Failed to delete class",
       })
+    }
+  }
+
+  const handleSaveSettings = async () => {
+    setIsSavingSettings(true)
+    try {
+      const res = await fetch(`/api/classes/${classId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: editName,
+          description: editDescription,
+          allowTaCreateEditQuizzes: taCreateQuizzes,
+          allowTaGradeScores: taGradeScores,
+          allowTaGrantRetakes: taGrantRetakes
+        }),
+      })
+
+      if (res.ok) {
+        toast({ title: "Settings saved successfully" })
+        fetchClassData()
+      } else {
+        throw new Error("Failed to save settings")
+      }
+    } catch (error) {
+      toast({ variant: "destructive", title: "Failed to save settings" })
+    } finally {
+      setIsSavingSettings(false)
     }
   }
 
@@ -280,10 +363,20 @@ export default function ClassDashboardPage() {
 
   if (!classData) return null
 
+  const isTeacher = classData.isTeacher
+  const isTA = classData.memberRole === "assistant"
+  const canCreateEditQuizzes = isTeacher || (isTA && classData.allowTaCreateEditQuizzes)
+
   const now = new Date()
   const activeQuizzes = quizzes.filter(q => new Date(q.startTime) <= now && new Date(q.endTime) > now)
   const upcomingQuizzes = quizzes.filter(q => new Date(q.startTime) > now)
   const pastQuizzes = quizzes.filter(q => new Date(q.endTime) <= now)
+
+  const taPermissions = {
+    canCreateEdit: canCreateEditQuizzes,
+    canGrade: isTeacher || (isTA && classData.allowTaGradeScores),
+    isTeacher
+  }
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -318,13 +411,14 @@ export default function ClassDashboardPage() {
           </div>
 
           <div className="flex gap-2">
-            <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
-              <DialogTrigger asChild>
-                <Button>
-                  <UserPlus className="mr-2 h-4 w-4" />
-                  Invite Students
-                </Button>
-              </DialogTrigger>
+            {isTeacher && (
+              <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button>
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    Invite Students
+                  </Button>
+                </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Invite Students</DialogTitle>
@@ -360,11 +454,13 @@ export default function ClassDashboardPage() {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
+            )}
 
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="outline" size="icon">
-                  <Trash2 className="h-4 w-4 text-destructive" />
+            {isTeacher && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline" size="icon">
+                    <Trash2 className="h-4 w-4 text-destructive" />
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
@@ -382,6 +478,7 @@ export default function ClassDashboardPage() {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
+            )}
           </div>
         </div>
 
@@ -430,17 +527,35 @@ export default function ClassDashboardPage() {
               <Mail className="h-4 w-4" />
               Invitations
             </TabsTrigger>
+            {isTeacher && (
+              <>
+                <TabsTrigger value="activity" className="gap-2">
+                  <Activity className="h-4 w-4" />
+                  Activity Log
+                </TabsTrigger>
+                <TabsTrigger value="settings" className="gap-2">
+                  <Settings className="h-4 w-4" />
+                  Settings
+                </TabsTrigger>
+              </>
+            )}
           </TabsList>
 
           {/* Quizzes Tab */}
           <TabsContent value="quizzes" className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-semibold">Class Quizzes</h2>
-              <Button asChild>
-                <Link href={`/classes/${classId}/quizzes/create`}>
+              {canCreateEditQuizzes ? (
+                <Button asChild>
+                  <Link href={`/classes/${classId}/quizzes/create`}>
+                    Create Quiz
+                  </Link>
+                </Button>
+              ) : (
+                <Button disabled title="You do not have permission to create quizzes">
                   Create Quiz
-                </Link>
-              </Button>
+                </Button>
+              )}
             </div>
 
             {quizzes.length === 0 ? (
@@ -453,14 +568,16 @@ export default function ClassDashboardPage() {
                   <p className="text-muted-foreground max-w-sm mx-auto">
                     Create your first quiz to engage your students and track their progress.
                   </p>
-                  <div className="pt-4">
-                    <Button asChild>
-                      <Link href={`/classes/${classId}/quizzes/create`}>
-                        <Plus className="mr-2 h-5 w-5" />
-                        Create Your First Quiz
-                      </Link>
-                    </Button>
-                  </div>
+                  {canCreateEditQuizzes && (
+                    <div className="pt-4">
+                      <Button asChild>
+                        <Link href={`/classes/${classId}/quizzes/create`}>
+                          <Plus className="mr-2 h-5 w-5" />
+                          Create Your First Quiz
+                        </Link>
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ) : (
@@ -469,7 +586,7 @@ export default function ClassDashboardPage() {
                   <div className="space-y-2">
                     <h3 className="font-medium text-green-600">Active Now</h3>
                     {activeQuizzes.map((quiz) => (
-                      <QuizCard key={quiz.id} quiz={quiz} classId={classId} onDelete={fetchQuizzes} />
+                      <QuizCard key={quiz.id} quiz={quiz} classId={classId} onDelete={fetchQuizzes} permissions={taPermissions} />
                     ))}
                   </div>
                 )}
@@ -477,7 +594,7 @@ export default function ClassDashboardPage() {
                   <div className="space-y-2">
                     <h3 className="font-medium text-blue-600">Upcoming</h3>
                     {upcomingQuizzes.map((quiz) => (
-                      <QuizCard key={quiz.id} quiz={quiz} classId={classId} onDelete={fetchQuizzes} />
+                      <QuizCard key={quiz.id} quiz={quiz} classId={classId} onDelete={fetchQuizzes} permissions={taPermissions} />
                     ))}
                   </div>
                 )}
@@ -485,7 +602,7 @@ export default function ClassDashboardPage() {
                   <div className="space-y-2">
                     <h3 className="font-medium text-muted-foreground">Past</h3>
                     {pastQuizzes.map((quiz) => (
-                      <QuizCard key={quiz.id} quiz={quiz} classId={classId} onDelete={fetchQuizzes} />
+                      <QuizCard key={quiz.id} quiz={quiz} classId={classId} onDelete={fetchQuizzes} permissions={taPermissions} />
                     ))}
                   </div>
                 )}
@@ -516,37 +633,59 @@ export default function ClassDashboardPage() {
             ) : (
               <div className="space-y-2">
                 {members.map((member) => (
-                  <Card key={member.id}>
+                  <Card key={member.id} className={member.role === "assistant" ? "border-blue-200 dark:border-blue-800" : ""}>
                     <CardContent className="p-4 flex items-center justify-between">
                       <div>
-                        <div className="font-medium">{member.name || member.email}</div>
+                        <div className="flex items-center gap-2">
+                           <span className="font-medium">{member.name || member.email}</span>
+                           {member.role === "assistant" && (
+                             <Badge variant="secondary" className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">Teaching Assistant</Badge>
+                           )}
+                        </div>
                         <div className="text-sm text-muted-foreground">{member.email}</div>
                       </div>
                       <div className="flex items-center gap-4">
-                        <div className="text-sm text-muted-foreground">
+                        <div className="text-sm text-muted-foreground hidden sm:block">
                           {member.quizzesAttempted}/{member.totalQuizzes} quizzes
                         </div>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <Trash2 className="h-4 w-4 text-destructive" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Remove Student?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                This will remove the student from the class. Their quiz attempts will be deleted.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => handleRemoveMember(member.id)}>
-                                Remove
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
+                        
+                        {/* Member Actions */}
+                        {isTeacher && (
+                          <div className="flex items-center gap-1">
+                            {member.role === "student" ? (
+                              <Button variant="outline" size="sm" onClick={() => handleUpdateRole(member.id, "assistant")} className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/30 dark:hover:text-blue-300">
+                                <ShieldCheck className="mr-2 h-4 w-4" />
+                                Make TA
+                              </Button>
+                            ) : (
+                              <Button variant="outline" size="sm" onClick={() => handleUpdateRole(member.id, "student")} className="text-orange-600 hover:text-orange-700 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-900/30 dark:hover:text-orange-300">
+                                <ShieldAlert className="mr-2 h-4 w-4" />
+                                Remove TA
+                              </Button>
+                            )}
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="ghost" size="sm" title="Remove student from class">
+                                  <Trash2 className="h-4 w-4 text-destructive" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Remove {member.name || "Student"}?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This will remove them from the class and delete their quiz attempts.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => handleRemoveMember(member.id)} className="bg-destructive text-destructive-foreground">
+                                    Remove
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
@@ -596,13 +735,136 @@ export default function ClassDashboardPage() {
               </div>
             )}
           </TabsContent>
+
+          {/* Activity Log Tab */}
+          <TabsContent value="activity" className="space-y-4">
+            {activities.length === 0 ? (
+              <Card className="border-dashed bg-muted/30">
+                <CardContent className="py-12 text-center space-y-4">
+                  <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+                    <Activity className="h-8 w-8 text-muted-foreground" />
+                  </div>
+                  <h3 className="text-xl font-semibold">No activity yet</h3>
+                  <p className="text-muted-foreground max-w-sm mx-auto">
+                    TA actions and other class activities will appear here.
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-4">
+                {activities.map((activity) => (
+                  <Card key={activity.id}>
+                    <CardContent className="p-4 flex items-start gap-4">
+                      <div className="mt-0.5 bg-muted p-2 rounded-full">
+                        <Activity className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <p className="font-medium">
+                            <span className="font-semibold">{activity.actor.name || activity.actor.email}</span>
+                            {" "}
+                            <span className="text-sm text-muted-foreground">({activity.actorRole === "assistant" ? "TA" : "Teacher"})</span>
+                          </p>
+                          <span className="text-sm text-muted-foreground">
+                            {format(new Date(activity.createdAt), "MMM d, h:mm a")}
+                          </span>
+                        </div>
+                        <p className="text-sm mt-1">
+                          {activity.action === "make_ta" && "Promoted a student to Teaching Assistant"}
+                          {activity.action === "remove_ta" && "Removed Teaching Assistant role from a student"}
+                          {activity.action === "create_quiz" && "Created a new quiz"}
+                          {activity.action === "update_quiz" && "Updated a quiz's settings"}
+                          {activity.action === "update_score" && "Modified a student's score"}
+                          {activity.action === "grant_retake" && "Granted a quiz retake"}
+                          {activity.action === "apply_correction" && "Applied a question correction"}
+                          {!["make_ta", "remove_ta", "create_quiz", "update_quiz", "update_score", "grant_retake", "apply_correction"].includes(activity.action) && `Performed action: ${activity.action}`}
+                        </p>
+                        {activity.details && (
+                          <pre className="mt-2 text-xs bg-muted p-2 rounded overflow-x-auto text-muted-foreground">
+                            {JSON.stringify(activity.details, null, 2)}
+                          </pre>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Settings Tab */}
+          <TabsContent value="settings" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Class Overview</CardTitle>
+                <CardDescription>Manage your class details.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Class Name</Label>
+                  <Input value={editName} onChange={(e) => setEditName(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Description</Label>
+                  <Textarea value={editDescription} onChange={(e) => setEditDescription(e.target.value)} />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Teaching Assistant Permissions</CardTitle>
+                <CardDescription>Delegate responsibilities to TAs assigned to this class.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label className="text-base">Create & Edit Quizzes</Label>
+                    <p className="text-sm text-muted-foreground">Allow TAs to build, modify, and delete questions.</p>
+                  </div>
+                  <Switch checked={taCreateQuizzes} onCheckedChange={setTaCreateQuizzes} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label className="text-base">Grade & Modify Scores</Label>
+                    <p className="text-sm text-muted-foreground">Allow TAs to score descriptive answers and give bonus points.</p>
+                  </div>
+                  <Switch checked={taGradeScores} onCheckedChange={setTaGradeScores} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label className="text-base">Grant Retakes</Label>
+                    <p className="text-sm text-muted-foreground">Allow TAs to grant individual or class-wide retakes.</p>
+                  </div>
+                  <Switch checked={taGrantRetakes} onCheckedChange={setTaGrantRetakes} />
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="flex justify-end">
+              <Button onClick={handleSaveSettings} disabled={isSavingSettings}>
+                {isSavingSettings && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Save Settings
+              </Button>
+            </div>
+          </TabsContent>
         </Tabs>
       </div>
     </div>
   )
 }
 
-function QuizCard({ quiz, classId, onDelete }: { quiz: any; classId: string; onDelete?: () => void }) {
+function QuizCard({ 
+  quiz, 
+  classId, 
+  onDelete, 
+  permissions 
+}: { 
+  quiz: any; 
+  classId: string; 
+  onDelete?: () => void;
+  permissions?: { canCreateEdit: boolean; canGrade: boolean; isTeacher: boolean }
+}) {
   const [isDeleting, setIsDeleting] = useState(false)
   const { toast } = useToast()
   const now = new Date()
@@ -648,12 +910,20 @@ function QuizCard({ quiz, classId, onDelete }: { quiz: any; classId: string; onD
           <span className="text-sm text-muted-foreground">
             {quiz._count?.attempts || 0} attempts
           </span>
-          <Button variant="outline" size="sm" asChild>
-            <Link href={`/classes/${classId}/quizzes/${quiz.id}/edit`}>
+          {permissions?.canCreateEdit ? (
+            <Button variant="outline" size="sm" asChild>
+              <Link href={`/classes/${classId}/quizzes/${quiz.id}/edit`}>
+                <Settings className="mr-1 h-3 w-3" />
+                Edit
+              </Link>
+            </Button>
+          ) : (
+            <Button variant="outline" size="sm" disabled title="You do not have permission to edit quizzes">
               <Settings className="mr-1 h-3 w-3" />
               Edit
-            </Link>
-          </Button>
+            </Button>
+          )}
+
           <Button variant="outline" size="sm" asChild>
             <Link href={`/classes/${classId}/quizzes/${quiz.id}/results`}>
               <Eye className="mr-1 h-3 w-3" />
@@ -666,35 +936,50 @@ function QuizCard({ quiz, classId, onDelete }: { quiz: any; classId: string; onD
               Preview
             </Link>
           </Button>
+
           {(quiz.questions as any[]).some((q: any) => q.type === "descriptive") && (
-            <Button variant="outline" size="sm" asChild className="border-amber-300 text-amber-700 hover:bg-amber-50 dark:border-amber-700 dark:text-amber-400 dark:hover:bg-amber-950/30">
-              <Link href={`/classes/${classId}/quizzes/${quiz.id}/grade`}>
+            permissions?.canGrade ? (
+              <Button variant="outline" size="sm" asChild className="border-amber-300 text-amber-700 hover:bg-amber-50 dark:border-amber-700 dark:text-amber-400 dark:hover:bg-amber-950/30">
+                <Link href={`/classes/${classId}/quizzes/${quiz.id}/grade`}>
+                  <FileText className="mr-1 h-3 w-3" />
+                  Grade
+                </Link>
+              </Button>
+            ) : (
+              <Button variant="outline" size="sm" disabled title="You do not have permission to grade quizzes" className="border-amber-300 text-amber-700 hover:bg-amber-50 dark:border-amber-700 dark:text-amber-400 dark:hover:bg-amber-950/30">
                 <FileText className="mr-1 h-3 w-3" />
                 Grade
-              </Link>
+              </Button>
+            )
+          )}
+
+          {permissions?.canCreateEdit ? (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" size="sm" disabled={isDeleting}>
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete Quiz?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will permanently delete "{quiz.name}" and all student attempts. This cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
+                    {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete Quiz"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          ) : (
+            <Button variant="ghost" size="sm" disabled title="You do not have permission to delete quizzes">
+              <Trash2 className="h-4 w-4 text-destructive opacity-50" />
             </Button>
           )}
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="ghost" size="sm" disabled={isDeleting}>
-                <Trash2 className="h-4 w-4 text-destructive" />
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Delete Quiz?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This will permanently delete "{quiz.name}" and all student attempts. This cannot be undone.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
-                  {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete Quiz"}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
         </div>
       </CardContent>
     </Card>

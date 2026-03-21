@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
-import { canGrantRetakes } from "@/lib/permissions"
+import { authorizeRetakes } from "@/lib/class-permissions"
+import { logClassActivity } from "@/lib/class-activity"
 
 // GET /api/classes/[id]/quizzes/[quizId]/retakes - List retakes
 export async function GET(
@@ -16,13 +17,14 @@ export async function GET(
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
         }
 
-        // Check if user is class teacher
+        // Check if user is authorized to manage retakes
         const classData = await prisma.class.findUnique({
             where: { id: params.id },
             select: { teacherId: true },
         })
 
-        if (!classData || classData.teacherId !== session.user.id) {
+        const canManageRetakes = await authorizeRetakes(params.id, session.user.id)
+        if (!classData || !canManageRetakes) {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 })
         }
 
@@ -63,13 +65,14 @@ export async function POST(
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
         }
 
-        // Check if user is class teacher
+        // Check if user can manage retakes
         const classData = await prisma.class.findUnique({
             where: { id: params.id },
             select: { teacherId: true, maxRetakes: true },
         })
 
-        if (!classData || classData.teacherId !== session.user.id) {
+        const canManageRetakes = await authorizeRetakes(params.id, session.user.id)
+        if (!classData || !canManageRetakes) {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 })
         }
 
@@ -118,15 +121,14 @@ export async function POST(
             },
         })
 
-        // Log admin action
-        await prisma.adminLog.create({
-            data: {
-                adminId: session.user.id,
-                action: "grant_retake",
-                targetType: "quiz",
-                targetId: params.quizId,
-                details: { retakeId: retake.id, type, memberId, reason },
-            },
+        // Log class action
+        await logClassActivity({
+            classId: params.id,
+            actorId: session.user.id,
+            action: "grant_retake",
+            targetType: "member",
+            targetId: type === "individual" ? memberId : params.id,
+            details: { retakeId: retake.id, type, reason },
         })
 
         return NextResponse.json(retake, { status: 201 })

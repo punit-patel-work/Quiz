@@ -215,7 +215,14 @@ export default function GradeQuizPage() {
             </Link>
           </Button>
           <div className="flex-1">
-            <h1 className="text-3xl font-bold">Grade Descriptive Answers</h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-3xl font-bold">Grade Descriptive Answers</h1>
+              {data.isTA && (
+                <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-md font-medium border border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800">
+                  TA Mode
+                </span>
+              )}
+            </div>
             <p className="text-muted-foreground">{data.quiz.name}</p>
           </div>
         </div>

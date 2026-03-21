@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
+import { authorizeQuizEdit } from "@/lib/class-permissions"
+import { logClassActivity } from "@/lib/class-activity"
 
 // GET /api/classes/[id]/quizzes/[quizId] - Get quiz details
 export async function GET(
@@ -58,6 +60,7 @@ export async function GET(
                 },
             },
         })
+        const memberRole = member?.role || null
 
         if (!isTeacher && !member) {
             return NextResponse.json(
@@ -75,8 +78,10 @@ export async function GET(
             )
         }
 
-        // If student, don't include questions unless starting attempt (handled by separate endpoint)
-        if (!isTeacher) {
+        // If student (and not TA with edit rights), don't include questions unless starting attempt (handled by separate endpoint)
+        const canEdit = await authorizeQuizEdit(params.id, session.user.id)
+
+        if (!canEdit) {
             // Count attempts
             const attemptsCount = member ? await prisma.classQuizAttempt.count({
                 where: {
@@ -126,12 +131,14 @@ export async function GET(
                 canAttempt: (attemptsCount < maxAttempts || !!activeAttempt) && quiz.endTime > now,
                 activeAttemptId: activeAttempt?.id,
                 isTeacher: false,
+                isTA: memberRole === "assistant"
             })
         }
 
         return NextResponse.json({
             ...quiz,
-            isTeacher: true,
+            isTeacher: isTeacher,
+            isTA: !isTeacher && canEdit
         })
     } catch (error) {
         console.error("Quiz fetch error:", error)
@@ -158,12 +165,9 @@ export async function PUT(
             )
         }
 
-        // Verify ownership
-        const classData = await prisma.class.findUnique({
-            where: { id: params.id },
-        })
+        const canEdit = await authorizeQuizEdit(params.id, session.user.id)
 
-        if (!classData || classData.teacherId !== session.user.id) {
+        if (!canEdit) {
             return NextResponse.json(
                 { error: "Access denied" },
                 { status: 403 }
@@ -198,6 +202,15 @@ export async function PUT(
             },
         })
 
+        await logClassActivity({
+            classId: params.id,
+            actorId: session.user.id,
+            action: "update_quiz",
+            targetType: "quiz",
+            targetId: quiz.id,
+            details: { name: updatedQuiz.name }
+        })
+
         return NextResponse.json(updatedQuiz)
     } catch (error) {
         console.error("Quiz update error:", error)
@@ -224,12 +237,9 @@ export async function DELETE(
             )
         }
 
-        // Verify ownership
-        const classData = await prisma.class.findUnique({
-            where: { id: params.id },
-        })
+        const canEdit = await authorizeQuizEdit(params.id, session.user.id)
 
-        if (!classData || classData.teacherId !== session.user.id) {
+        if (!canEdit) {
             return NextResponse.json(
                 { error: "Access denied" },
                 { status: 403 }
@@ -238,6 +248,15 @@ export async function DELETE(
 
         await prisma.classQuiz.delete({
             where: { id: params.quizId },
+        })
+
+        await logClassActivity({
+            classId: params.id,
+            actorId: session.user.id,
+            action: "update_quiz", // Note: A dedicated delete_quiz action might be better, parsing as update here. Let's just use update_quiz to mean modifications. We'll use "update_quiz" with details "Deleted Quiz"
+            targetType: "quiz",
+            targetId: params.quizId,
+            details: { name: "Deleted Quiz" }
         })
 
         return NextResponse.json({ message: "Quiz deleted successfully" })

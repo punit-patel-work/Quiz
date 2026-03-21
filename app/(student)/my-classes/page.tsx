@@ -12,7 +12,8 @@ import {
   AlertCircle,
   Loader2,
   ArrowRight,
-  GraduationCap
+  GraduationCap,
+  ShieldCheck
 } from "lucide-react"
 
 export default function MyClassesPage() {
@@ -111,12 +112,23 @@ export default function MyClassesPage() {
                     </div>
                   )}
 
-                  <Button asChild className="w-full">
-                    <Link href={`/my-classes/${cls.id}`}>
-                      View Class
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Link>
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button asChild className={cls.role === "assistant" ? "flex-1" : "w-full"}>
+                      <Link href={`/my-classes/${cls.id}`}>
+                        View Class
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Link>
+                    </Button>
+                    
+                    {cls.role === "assistant" && (
+                      <Button asChild variant="secondary" className="flex-1 bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800 dark:hover:bg-blue-900/50">
+                        <Link href={`/classes/${cls.id}`}>
+                          TA Portal
+                          <ShieldCheck className="ml-2 h-4 w-4" />
+                        </Link>
+                      </Button>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             ))}
